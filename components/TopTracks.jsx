@@ -8,27 +8,41 @@ export default function TopTracks() {
   const { data: session } = useSession();
   const spotify = useSpotify();
   const [topTracks, setTopTracks] = useState([]);
-  
-  // State untuk menyimpan pilihan waktu (Default: 1 Bulan / short_term)
   const [activeRange, setActiveRange] = useState("short_term");
+  
+  // Default true, jadi pas pertama load dia langsung loading (Aman!)
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (spotify.getAccessToken()) {
+      // ❌ HAPUS setLoading(true) DARI SINI BIAR GAK ERROR ESLINT
+      
       spotify
-        .getMyTopTracks({ limit: 5, time_range: activeRange }) // <--- Pake variabel state
+        .getMyTopTracks({ limit: 5, time_range: activeRange })
         .then((data) => {
           setTopTracks(data.body.items);
+          setLoading(false); // Stop loading kalau sukses
         })
-        .catch((err) => console.error("Gagal ambil top tracks:", err));
+        .catch((err) => {
+          console.error("Gagal ambil top tracks:", err);
+          setLoading(false); // Stop loading kalau error
+        });
     }
-  }, [session, spotify, activeRange]); // <--- Kalau activeRange berubah, fetch ulang!
+  }, [session, spotify, activeRange]);
 
-  // Helper untuk label tombol
   const ranges = [
     { key: "short_term", label: "Last Month" },
     { key: "medium_term", label: "6 Months" },
     { key: "long_term", label: "All Time" },
   ];
+
+  // Helper function buat handle klik tombol
+  const handleRangeChange = (key) => {
+    if (key === activeRange) return; // Kalau klik tombol yg sama, cuekin aja
+    
+    setLoading(true); // <--- ✅ PINDAH KESINI (Set loading pas diklik)
+    setActiveRange(key);
+  };
 
   return (
     <div>
@@ -41,18 +55,20 @@ export default function TopTracks() {
       <div className="bg-white/50 border-2 border-retro-dark p-6 relative">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-retro-dark rounded-full"></div>
 
-        {/* --- TOMBOL GANTI WAKTU (BARU) --- */}
         <div className="flex justify-center gap-2 mb-6 border-b-2 border-dashed border-retro-dark pb-4">
           {ranges.map((range) => (
             <button
               key={range.key}
-              onClick={() => setActiveRange(range.key)}
+              // Panggil helper function tadi
+              onClick={() => handleRangeChange(range.key)}
+              disabled={loading} 
               className={`
                 px-3 py-1 text-[10px] font-bold font-mono uppercase rounded-full border border-retro-dark transition-all
                 ${activeRange === range.key 
-                  ? "bg-retro-dark text-retro-bg" // Style kalau Aktif
-                  : "bg-transparent text-retro-dark hover:bg-retro-light/20" // Style kalau Mati
+                  ? "bg-retro-dark text-retro-bg" 
+                  : "bg-transparent text-retro-dark hover:bg-retro-light/20"
                 }
+                ${loading ? "opacity-50 cursor-wait" : ""}
               `}
             >
               {range.label}
@@ -61,7 +77,19 @@ export default function TopTracks() {
         </div>
 
         <ul className="space-y-4">
-          {topTracks.length > 0 ? (
+          {loading ? (
+             // SKELETON LOADER
+             [...Array(5)].map((_, i) => (
+               <li key={i} className="flex items-center gap-3 animate-pulse">
+                  <div className="w-6 h-4 bg-retro-dark/10 rounded"></div>
+                  <div className="w-10 h-10 bg-retro-dark/20 rounded-none"></div>
+                  <div className="flex-1 space-y-2">
+                    <div className="h-3 w-3/4 bg-retro-dark/20 rounded"></div>
+                    <div className="h-2 w-1/2 bg-retro-dark/10 rounded"></div>
+                  </div>
+               </li>
+             ))
+          ) : topTracks.length > 0 ? (
             topTracks.map((track, index) => (
               <li key={track.id} className="flex items-center gap-3 group">
                 <span className="font-mono text-retro-light font-bold text-lg w-6">
@@ -90,8 +118,8 @@ export default function TopTracks() {
               </li>
             ))
           ) : (
-            <div className="text-center py-4 opacity-50 text-sm animate-pulse">
-              Calculating charts...
+            <div className="text-center py-4 opacity-50 text-sm">
+              No data available.
             </div>
           )}
         </ul>
