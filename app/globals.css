@@ -1,0 +1,28 @@
+@import "tailwindcss";
+
+@theme {
+  /* --- Warna Retro --- */
+  --color-retro-bg: #EAEBD0;
+  --color-retro-light: #DA6C6C;
+  --color-retro-primary: #CD5656;
+  --color-retro-dark: #AF3E3E;
+  --color-retro-text: #3E2723;
+
+  /* --- FONT BARU --- */
+  /* 'font-display' akan pakai Syne */
+  --font-display: var(--font-syne), sans-serif;
+  
+  /* 'font-body' akan pakai Space Mono */
+  --font-body: var(--font-space-mono), monospace;
+}
+
+body {
+  background-color: var(--color-retro-bg);
+  color: var(--color-retro-text);
+  font-family: var(--font-body); 
+}
+
+/* Khusus Heading (h1, h2, h3) kita paksa pake Syne */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+}
