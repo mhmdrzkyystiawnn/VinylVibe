@@ -1,6 +1,6 @@
 import NextAuth from "next-auth";
 import SpotifyProvider from "next-auth/providers/spotify";
-import spotifyApi, { LOGIN_URL } from "@/lib/spotify";
+import spotifyApi, { scopes } from "@/lib/spotify"; // <--- Import scopes dari sini
 
 async function refreshAccessToken(token) {
   try {
@@ -29,7 +29,13 @@ const handler = NextAuth({
     SpotifyProvider({
       clientId: process.env.SPOTIFY_CLIENT_ID,
       clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
-      authorization: LOGIN_URL,
+      // --- BAGIAN PENTING (JANGAN DIUBAH) ---
+      // Kita suruh NextAuth pake URL login default Spotify, 
+      // tapi dengan tambahan 'scopes' kita.
+      authorization: {
+        params: { scope: scopes }, 
+      },
+      // ---------------------------------------
     }),
   ],
   secret: process.env.NEXTAUTH_SECRET,

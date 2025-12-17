@@ -24,17 +24,6 @@ export default function Home() {
     }
   }, [session, spotify]);
 
-  // Redirect Login
-  if (status === "unauthenticated") {
-    return (
-      <div className="h-screen flex items-center justify-center bg-retro-bg">
-        <a href="/login" className="text-retro-dark underline font-bold text-xl">
-          Please Login First
-        </a>
-      </div>
-    );
-  }
-
   return (
     <main className="min-h-screen p-8 bg-retro-bg text-retro-dark font-body">
       

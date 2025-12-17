@@ -74,6 +74,7 @@ export default function TopTracks() {
                     alt={track.name}
                     width={40}
                     height={40}
+                    unoptimized
                     className="object-cover w-full h-full group-hover:scale-110 transition"
                   />
                 </div>

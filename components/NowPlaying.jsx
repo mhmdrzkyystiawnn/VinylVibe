@@ -1,9 +1,11 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
+import { useSession } from "next-auth/react"; // <--- 1. TAMBAH IMPORT INI
 import useSpotify from "@/hooks/useSpotify";
 import Image from "next/image";
 
 export default function NowPlaying() {
+  const { data: session } = useSession(); // <--- 2. AMBIL DATA SESSION
   const spotify = useSpotify();
   const [nowPlaying, setNowPlaying] = useState(null);
   const [progress, setProgress] = useState(0);
@@ -12,7 +14,6 @@ export default function NowPlaying() {
   
   const progressRef = useRef(progress);
 
-  // Helper Format Waktu
   const formatTime = (ms) => {
     if (!ms) return "0:00";
     const minutes = Math.floor(ms / 60000);
@@ -26,11 +27,13 @@ export default function NowPlaying() {
 
   // LOGIC POLLING & SYNC
   useEffect(() => {
+    // Cek token. Kalau token belum ada, jangan lakukan apa-apa.
     if (!spotify.getAccessToken()) return;
 
     let pollInterval = null;
 
     const fetchNowPlaying = () => {
+      // Logic pintar: Kalau user pindah tab, stop fetch biar hemat
       if (document.hidden) return;
 
       spotify
@@ -50,12 +53,18 @@ export default function NowPlaying() {
             setNowPlaying(null);
             setIsPlaying(false);
           }
-          setLoading(false);
+          setLoading(false); // <--- Stop loading kalau sukses
         })
-        .catch((error) => console.error("Error polling:", error));
+        .catch((error) => {
+          console.error("Error polling:", error);
+          setLoading(false); // <--- Stop loading kalau error
+        });
     };
 
+    // Jalankan sekali saat komponen (dan session) siap
     fetchNowPlaying();
+
+    // Jalankan interval polling
     pollInterval = setInterval(fetchNowPlaying, 5000);
 
     const handleVisibilityChange = () => {
@@ -68,7 +77,7 @@ export default function NowPlaying() {
       clearInterval(pollInterval);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
-  }, [spotify]);
+  }, [session, spotify]); // <--- 3. PENTING: Masukkan 'session' ke sini!
 
   // LOGIC TIMER LOKAL
   useEffect(() => {
@@ -106,6 +115,7 @@ export default function NowPlaying() {
                 width={640}
                 height={640}
                 priority
+                unoptimized
                 className={`w-full h-full object-cover transition duration-500 ${
                   !isPlaying ? "grayscale" : ""
                 }`}
