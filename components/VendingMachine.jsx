@@ -6,11 +6,62 @@ import Image from "next/image";
 
 const LASTFM_API_KEY = process.env.NEXT_PUBLIC_LASTFM_API_KEY || 'YOUR_LASTFM_KEY_HERE';
 
+// --- ICON COMPONENTS (SVG) - 8-Bit Style ---
+const Icons = {
+  Music: ({ className }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
+      <path d="M2 4h20v16H2V4zm2 2v12h16V6H4z" />
+      <path d="M6 8h12v6H6V8z" />
+      <path d="M8 10h2v2H8v-2z" fill="var(--color-background, rgba(0,0,0,0.5))" />
+      <path d="M14 10h2v2h-2v-2z" fill="var(--color-background, rgba(0,0,0,0.5))" />
+      <path d="M6 18h12v2H6v-2z" />
+      <path d="M3 5h1v1H3V5zm17 0h1v1h-1V5zm0 13h1v1h-1v-1zM3 18h1v1H3v-1z" />
+    </svg>
+  ),
+  Coin: ({ className }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
+      <path d="M8 2h8v2h4v4h2v8h-2v4h-4v2H8v-2H4v-4H2V8h2V4h4V2zm0 2H4v4H2v8h2v4h4v2h8v-2h4v-4h2V8h-2V4h-4V2H8v2zm3 2h2v2h2v2h-4v2h4v2h-2v2h-2v-2h-2v-2h4v-2h-4V8h2V6z" />
+    </svg>
+  ),
+  Dice: ({ className }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
+      <path d="M4 2h16v20H4V2zm2 2v16h12V4H6zm3 3h2v2H9V7zm6 0h2v2h-2V7zm-3 3.5h2v2h-2v-2zM9 14h2v2H9v-2zm6 0h2v2h-2v-2z" />
+    </svg>
+  ),
+  Play: ({ className }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
+      <path d="M6 4v16h2v-2h2v-2h2v-2h2v-2h2v-2h-2V8h-2V6h-2V4H6z" />
+    </svg>
+  ),
+  Plus: ({ className }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
+      <path d="M10 4h4v6h6v4h-6v6h-4v-6H4v-4h6V4z" />
+    </svg>
+  ),
+  Warning: ({ className }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
+      <path d="M10 2h4v10h-4V2zm0 14h4v4h-4v-4z M2 20h20v2H2v-2z" />
+    </svg>
+  ),
+  Star: ({ className }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
+      <path d="M10 2h4v4h4v4h4v4h-4v4h-4v4h-4v-4H6v-4H2v-4h4V6h4V2z" />
+    </svg>
+  ),
+  Gear: ({ className }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
+      <path d="M10 2h4v2h4v4h2v2h2v4h-2v2h-2v4h-4v2h-4v-2H6v-4H4v-2H2v-4h2V8h2V4h4V2zm2 6a4 4 0 1 0 0 8 4 4 0 0 0 0-8z" />
+    </svg>
+  )
+};
+
 export default function VendingMachine() {
   const { data: session } = useSession();
   const spotify = useSpotify();
 
+  // State Management
   const [recommendations, setRecommendations] = useState([]);
+  const [scanType, setScanType] = useState("");
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState("IDLE");
   const [usedTrackIds, setUsedTrackIds] = useState([]);
@@ -22,22 +73,21 @@ export default function VendingMachine() {
 
   const audioContextRef = useRef(null);
 
+  // Initialize Audio Context
   useEffect(() => {
     if (typeof window !== 'undefined') {
       audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
     }
   }, []);
 
-  // Check if user is premium
+  // Check Premium Status
   useEffect(() => {
     const checkPremium = async () => {
       if (spotify && session) {
         try {
           const user = await spotify.getMe();
           setIsPremium(user.body.product === 'premium');
-          console.log('User premium status:', user.body.product);
-        } catch (err) {
-          console.log('Could not check premium status:', err);
+        } catch {
           setIsPremium(false);
         }
       }
@@ -45,22 +95,18 @@ export default function VendingMachine() {
     checkPremium();
   }, [spotify, session]);
 
+  // Sound Effects Utilities
   const playSound = (frequency, duration, type = 'sine') => {
     if (!audioContextRef.current) return;
-    
     const ctx = audioContextRef.current;
     const oscillator = ctx.createOscillator();
     const gainNode = ctx.createGain();
-    
     oscillator.connect(gainNode);
     gainNode.connect(ctx.destination);
-    
     oscillator.frequency.value = frequency;
     oscillator.type = type;
-    
     gainNode.gain.setValueAtTime(0.3, ctx.currentTime);
     gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + duration);
-    
     oscillator.start(ctx.currentTime);
     oscillator.stop(ctx.currentTime + duration);
   };
@@ -86,24 +132,23 @@ export default function VendingMachine() {
     setTimeout(() => playSound(784, 0.3), 300);
   };
 
+  // Main Action: Insert Coin
   const dispenseMix = async () => {
     const accessToken = spotify?.getAccessToken();
-    
     if (!accessToken) {
       alert("Please login to Spotify first!");
       playErrorSound();
       return;
     }
-
     setCoinAnimation(true);
     playCoinSound();
-    
     setTimeout(() => {
       setCoinAnimation(false);
       startBrewing();
     }, 800);
   };
 
+  // Core Logic: The Vending Algorithm
   const startBrewing = async () => {
     setLoading(true);
     setStatus("BREWING");
@@ -111,33 +156,33 @@ export default function VendingMachine() {
     setSeedInfo(null);
     setDispensing(false);
     setMachineShake(true);
+    setScanType("SCANNING...");
 
     const shakeInterval = setInterval(() => {
       playSound(150, 0.05, 'square');
     }, 200);
 
     try {
-      console.log('🔑 Last.fm API Key:', LASTFM_API_KEY ? 'EXISTS' : 'MISSING');
-      
-      const useTopTracks = Math.random() > 0.5;
+      const rng = Math.random(); 
       let tracks;
-
-      console.log(`📊 Using ${useTopTracks ? 'Top Tracks' : 'Recently Played'}`);
-
-      if (useTopTracks) {
-        const result = await spotify.getMyTopTracks({ 
-          limit: 20, 
-          time_range: 'short_term'
-        });
+      
+      if (rng > 0.4) {
+        setScanType("CURRENT OBSESSION");
+        const result = await spotify.getMyTopTracks({ limit: 20, time_range: 'short_term' });
         tracks = result.body.items;
-        console.log(`✅ Got ${tracks.length} top tracks`);
-      } else {
+      } else if (rng > 0.1) {
+        setScanType("RECENT VIBES");
         const result = await spotify.getMyRecentlyPlayedTracks({ limit: 20 });
         tracks = result.body.items.map(item => item.track);
-        console.log(`✅ Got ${tracks.length} recent tracks`);
+      } else {
+        setScanType("✨ NOSTALGIA HIT ✨");
+        const result = await spotify.getMyTopTracks({ limit: 20, time_range: 'long_term' });
+        tracks = result.body.items;
+        playSound(1200, 0.1);
+        setTimeout(() => playSound(1200, 0.1), 150);
       }
-      
-      if (!tracks.length) {
+
+      if (!tracks || tracks.length === 0) {
          alert("Butuh listening history dulu buat racik lagu!");
          playErrorSound();
          setLoading(false);
@@ -147,10 +192,7 @@ export default function VendingMachine() {
          return;
       }
 
-      let availableTracks = tracks.filter(
-        track => !usedTrackIds.includes(track.id)
-      );
-
+      let availableTracks = tracks.filter(track => !usedTrackIds.includes(track.id));
       if (availableTracks.length === 0) {
         setUsedTrackIds([]);
         availableTracks = tracks;
@@ -158,11 +200,8 @@ export default function VendingMachine() {
 
       const randomIndex = Math.floor(Math.random() * availableTracks.length);
       const seedTrack = availableTracks[randomIndex];
-      
       const artistName = seedTrack.artists[0].name;
       const trackName = seedTrack.name;
-
-      console.log(`🎲 Seed Track: "${trackName}" by ${artistName}`);
 
       setSeedInfo({ 
         name: trackName, 
@@ -173,35 +212,21 @@ export default function VendingMachine() {
       setUsedTrackIds(prev => [...prev, seedTrack.id]);
 
       const lastfmUrl = `https://ws.audioscrobbler.com/2.0/?method=track.getsimilar&artist=${encodeURIComponent(artistName)}&track=${encodeURIComponent(trackName)}&api_key=${LASTFM_API_KEY}&format=json&limit=15`;
-      
-      console.log('🌐 Fetching from Last.fm...');
-      
       const lastfmResponse = await fetch(lastfmUrl);
-      console.log('📡 Last.fm Response Status:', lastfmResponse.status);
-      
       const lastfmData = await lastfmResponse.json();
-      console.log('📦 Last.fm Data:', lastfmData);
 
-      if (lastfmData.error) {
-        throw new Error(`Last.fm Error: ${lastfmData.message}`);
-      }
+      if (lastfmData.error) throw new Error(`Last.fm Error: ${lastfmData.message}`);
 
       if (!lastfmData.similartracks?.track || lastfmData.similartracks.track.length === 0) {
-        console.warn('⚠️ No similar tracks found, trying fallback...');
-        
         const artistId = seedTrack.artists[0].id;
         const artistTopTracks = await spotify.getArtistTopTracks(artistId, 'US');
-        const fallbackTracks = artistTopTracks.body.tracks
-          .filter(t => t.id !== seedTrack.id)
-          .slice(0, 3);
+        const fallbackTracks = artistTopTracks.body.tracks.filter(t => t.id !== seedTrack.id).slice(0, 3);
         
         if (fallbackTracks.length > 0) {
-          console.log('✅ Using fallback: Artist top tracks');
           clearInterval(shakeInterval);
           setMachineShake(false);
           setDispensing(true);
           playDispenseSound();
-          
           setTimeout(() => {
             setRecommendations(fallbackTracks);
             setStatus("SERVED");
@@ -211,44 +236,27 @@ export default function VendingMachine() {
           }, 1800);
           return;
         }
-        
         throw new Error("No similar tracks found");
       }
 
-      console.log(`✅ Found ${lastfmData.similartracks.track.length} similar tracks`);
-
-      const similarTracks = lastfmData.similartracks.track
-        .sort(() => Math.random() - 0.5)
-        .slice(0, 8);
-
-      console.log('🔍 Searching on Spotify...');
+      const similarTracks = lastfmData.similartracks.track.sort(() => Math.random() - 0.5).slice(0, 8);
       const spotifyTracks = [];
       
       for (const track of similarTracks) {
         try {
           const searchQuery = `track:${track.name} artist:${track.artist.name}`;
           const searchResult = await spotify.searchTracks(searchQuery, { limit: 1 });
-          
           if (searchResult.body.tracks.items.length > 0) {
             spotifyTracks.push(searchResult.body.tracks.items[0]);
-            console.log(`✓ Found: ${track.name}`);
           }
-        } catch {
-          console.log(`✗ Could not find: ${track.name}`);
-        }
-
+        } catch {}
         if (spotifyTracks.length >= 3) break;
       }
 
-      console.log(`🎵 Final tracks: ${spotifyTracks.length}`);
-
-      if (spotifyTracks.length === 0) {
-        throw new Error("Could not find tracks on Spotify");
-      }
+      if (spotifyTracks.length === 0) throw new Error("Could not find tracks on Spotify");
 
       clearInterval(shakeInterval);
       setMachineShake(false);
-
       setDispensing(true);
       playDispenseSound();
       
@@ -261,22 +269,18 @@ export default function VendingMachine() {
       }, 1800);
       
     } catch (err) {
-      console.error("❌ Mesin Macet:", err);
-      console.error("Error details:", err.message);
+      console.error(err);
       setStatus("ERROR");
       setLoading(false);
       setMachineShake(false);
       clearInterval(shakeInterval);
       playErrorSound();
-      
-      alert(`Error: ${err.message}\n\nCheck console (F12) for details.`);
     }
   };
 
   const openInSpotify = (uri) => {
     const spotifyUrl = uri.replace('spotify:track:', 'https://open.spotify.com/track/');
     window.open(spotifyUrl, '_blank');
-    
     playSound(880, 0.1);
     setTimeout(() => playSound(1046, 0.1), 100);
   };
@@ -288,21 +292,21 @@ export default function VendingMachine() {
         playSound(880, 0.1);
         setTimeout(() => playSound(1046, 0.1), 100);
         alert("✅ Added to queue!"); 
-    } catch (err) {
-        console.log("Queue not available:", err.message);
+    } catch {
         playErrorSound();
-        alert("Failed to add to queue. Please try again.");
+        alert("Failed to add to queue.");
     }
   };
 
   return (
-    <div className="w-full mx-auto relative select-none">
+    // FIX: Menggunakan max-w-sm (sedikit lebih kecil dari md) agar lebih proporsional di HP
+    <div className="w-full max-w-sm md:max-w-md mx-auto relative select-none px-4 py-4 md:py-8">
       
       {/* Coin Animation */}
       {coinAnimation && (
         <div className="absolute top-20 left-1/2 -translate-x-1/2 z-50 animate-coin-drop pointer-events-none">
-          <div className="w-8 h-8 rounded-full bg-linear-to-br from-yellow-300 via-yellow-500 to-yellow-700 border-4 border-yellow-900 shadow-2xl flex items-center justify-center text-yellow-900 font-black text-lg">
-            ¢
+          <div className="w-8 h-8 rounded-full bg-yellow-500 border-2 border-yellow-700 shadow-xl flex items-center justify-center text-yellow-900">
+             <Icons.Coin className="w-6 h-6" />
           </div>
         </div>
       )}
@@ -310,159 +314,132 @@ export default function VendingMachine() {
       {/* === VENDING MACHINE BODY === */}
       <div className={`relative transition-transform duration-75 ${machineShake ? 'animate-shake' : ''}`}>
         
-        {/* MAIN BODY - 90s Retro Machine */}
-        <div className="relative bg-linear-to-b from-[#D4B896] via-retro-bg to-[#C4A57B] border-4 border-retro-text rounded-2xl p-6 shadow-[8px_8px_0px_0px_rgba(62,39,35,1)]">
+        {/* MAIN BODY */}
+        <div className="relative bg-linear-to-b from-[#D4B896] via-retro-bg to-[#C4A57B] border-4 border-retro-text rounded-2xl p-4 md:p-6 shadow-[4px_4px_0px_0px_rgba(62,39,35,1)] md:shadow-[8px_8px_0px_0px_rgba(62,39,35,1)]">
           
           {/* Decorative Corner Brackets */}
-          <div className="absolute top-2 left-2 w-4 h-4 border-l-2 border-t-2 border-retro-dark/50"></div>
-          <div className="absolute top-2 right-2 w-4 h-4 border-r-2 border-t-2 border-retro-dark/50"></div>
-          <div className="absolute bottom-2 left-2 w-4 h-4 border-l-2 border-b-2 border-retro-dark/50"></div>
-          <div className="absolute bottom-2 right-2 w-4 h-4 border-r-2 border-b-2 border-retro-dark/50"></div>
+          <div className="absolute top-2 left-2 w-3 h-3 md:w-4 md:h-4 border-l-2 border-t-2 border-retro-dark/50"></div>
+          <div className="absolute top-2 right-2 w-3 h-3 md:w-4 md:h-4 border-r-2 border-t-2 border-retro-dark/50"></div>
+          <div className="absolute bottom-2 left-2 w-3 h-3 md:w-4 md:h-4 border-l-2 border-b-2 border-retro-dark/50"></div>
+          <div className="absolute bottom-2 right-2 w-3 h-3 md:w-4 md:h-4 border-r-2 border-b-2 border-retro-dark/50"></div>
 
           {/* Coin Slot */}
-          <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-30 bg-linear-to-b from-gray-600 to-gray-900 px-4 py-2 rounded-t-xl border-3 border-retro-text shadow-lg">
-            <div className="w-16 h-3 bg-black rounded-sm border border-gray-800 shadow-inner flex items-center justify-center">
-              <div className="text-[8px] text-amber-500/70 font-mono font-bold">INSERT</div>
+          <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-30 bg-linear-to-b from-gray-600 to-gray-900 px-3 py-1.5 md:px-4 md:py-2 rounded-t-xl border-3 border-retro-text shadow-lg">
+            <div className="w-12 h-2.5 md:w-16 md:h-3 bg-black rounded-sm border border-gray-800 shadow-inner flex items-center justify-center">
+              <div className="text-[6px] md:text-[8px] text-amber-500/70 font-mono font-bold">INSERT</div>
             </div>
           </div>
 
-          {/* === DISPLAY WINDOW - CRT Monitor Style === */}
-          <div className="relative bg-linear-to-b from-gray-900 via-black to-gray-900 border-4 border-retro-text rounded-xl p-5 min-h-70 mb-5 overflow-hidden shadow-[inset_0_0_30px_rgba(0,0,0,0.9)]">
+          {/* === DISPLAY WINDOW === */}
+          {/* FIX: Ubah min-h agar dinamis di mobile (300px) dan desktop (350px) */}
+          <div className="relative bg-linear-to-b from-gray-900 via-black to-gray-900 border-4 border-retro-text rounded-xl p-3 md:p-5 min-h-75 md:min-h-95 mb-4 md:mb-5 overflow-hidden shadow-[inset_0_0_30px_rgba(0,0,0,0.9)] flex flex-col">
             
-            {/* CRT Screen Curvature Effect */}
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.3)_100%)] pointer-events-none"></div>
-            
-            {/* Screen Glare - Top Left */}
-            <div className="absolute top-4 left-4 w-24 h-24 bg-white/5 rounded-full blur-2xl pointer-events-none"></div>
-            
-            {/* Scanlines - Subtle */}
-            <div className="absolute inset-0 bg-[repeating-linear-gradient(0deg,rgba(205,86,86,0.03),rgba(205,86,86,0.03)_1px,transparent_1px,transparent_2px)] pointer-events-none"></div>
+            {/* Screen Effects */}
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.3)_100%)] pointer-events-none z-20"></div>
+            <div className="absolute top-4 left-4 w-24 h-24 bg-white/5 rounded-full blur-2xl pointer-events-none z-20"></div>
+            <div className="absolute inset-0 bg-[repeating-linear-gradient(0deg,rgba(205,86,86,0.03),rgba(205,86,86,0.03)_1px,transparent_1px,transparent_2px)] pointer-events-none z-20"></div>
 
-            {/* CONTENT */}
-            <div className="relative z-10">
+            {/* CONTENT WRAPPER */}
+            <div className="relative z-10 w-full h-full flex flex-col justify-center overflow-y-auto no-scrollbar">
+              
               {loading && !dispensing ? (
                 <div className="text-center space-y-4 py-4">
-                  <div className="text-retro-primary font-mono text-sm font-bold animate-pulse">
+                  <div className="text-retro-primary font-mono text-xs md:text-sm font-bold animate-pulse">
                     [ ANALYZING MUSIC DNA... ]
                   </div>
+
+                   {/* --- INDIKATOR MODE --- */}
+                   <div className={`
+                    text-[10px] md:text-xs font-black tracking-widest py-1 px-2 rounded border-2 inline-block mb-2
+                    ${scanType.includes("NOSTALGIA") 
+                      ? "text-purple-400 border-purple-400 bg-purple-900/30 animate-bounce shadow-[0_0_10px_rgba(192,132,252,0.8)]" 
+                      : "text-green-400 border-green-400 bg-green-900/20"}
+                  `}>
+                    MODE: {scanType}
+                  </div>
+
                   {seedInfo && (
-                    <div className="flex items-center justify-center gap-3 bg-retro-primary/10 p-3 rounded-lg border-2 border-retro-primary/30">
+                    <div className="flex items-center justify-center gap-3 bg-retro-primary/10 p-2 md:p-3 rounded-lg border-2 border-retro-primary/30 mx-2">
                       {seedInfo.image && (
-                        <Image 
-                          src={seedInfo.image} 
-                          width={50} 
-                          height={50} 
-                          alt="seed"
-                          className="rounded border-2 border-retro-primary shadow-lg" 
-                        />
+                        <Image src={seedInfo.image} width={40} height={40} alt="seed" className="rounded border-2 border-retro-primary shadow-lg shrink-0 w-10 h-10 md:w-12 md:h-12" />
                       )}
-                      <div className="text-left">
-                        <p className="text-[10px] text-retro-primary/80 font-mono font-bold mb-1">SEED TRACK:</p>
-                        <p className="text-sm font-bold text-retro-light">{seedInfo.name}</p>
-                        <p className="text-xs text-retro-bg/60">{seedInfo.artist}</p>
+                      <div className="text-left min-w-0">
+                        <p className="text-[8px] md:text-[10px] text-retro-primary/80 font-mono font-bold mb-1">SEED TRACK:</p>
+                        <p className="text-xs md:text-sm font-bold text-retro-light truncate">{seedInfo.name}</p>
+                        <p className="text-[10px] md:text-xs text-retro-bg/60 truncate">{seedInfo.artist}</p>
                       </div>
                     </div>
                   )}
-                  <div className="flex items-center justify-center gap-2 text-retro-primary/60 font-mono text-xs">
-                    <div className="animate-spin">⚙</div>
-                    <span>CONSULTING LAST.FM DATABASE...</span>
+                  <div className="flex items-center justify-center gap-2 text-retro-primary/60 font-mono text-[10px] md:text-xs mt-4">
+                    <Icons.Gear className="w-3 h-3 md:w-4 md:h-4 animate-spin" />
+                    <span>CONSULTING LAST.FM...</span>
                   </div>
                 </div>
               ) : dispensing ? (
-                <div className="text-center space-y-6 py-6">
-                  <div className="text-retro-primary font-display font-black text-2xl animate-pulse">
+                <div className="text-center space-y-4 md:space-y-6 py-6">
+                  <div className="text-retro-primary font-display font-black text-xl md:text-2xl animate-pulse">
                     ⬇ DISPENSING ⬇
                   </div>
-                  <div className="flex justify-center gap-4">
+                  <div className="flex justify-center gap-2 md:gap-4">
                     {[...Array(3)].map((_, i) => (
-                      <div 
-                        key={i} 
-                        className="relative animate-item-drop"
-                        style={{ animationDelay: `${i * 0.3}s` }}
-                      >
-                        <div className="w-20 h-24 bg-linear-to-br from-retro-light/40 to-retro-dark/40 border-4 border-retro-primary rounded-xl shadow-2xl flex items-center justify-center backdrop-blur-sm">
-                          <div className="text-5xl">🎵</div>
+                      <div key={i} className="relative animate-item-drop" style={{ animationDelay: `${i * 0.3}s` }}>
+                        <div className="w-14 h-18 md:w-20 md:h-24 bg-linear-to-br from-retro-light/40 to-retro-dark/40 border-4 border-retro-primary rounded-xl shadow-2xl flex items-center justify-center backdrop-blur-sm">
+                           <Icons.Music className="w-8 h-8 md:w-12 md:h-12 text-retro-primary" />
                         </div>
-                        <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-16 h-2 bg-black/60 rounded-full blur-md"></div>
                       </div>
                     ))}
                   </div>
                 </div>
               ) : status === "IDLE" ? (
-                <div className="text-center space-y-5 py-12">
-                  <div className="text-7xl mb-4 animate-bounce">🎵</div>
-                  <div className="text-retro-bg font-mono text-base font-bold opacity-90">
-                    INSERT COIN TO GET
+                <div className="text-center space-y-3 md:space-y-4 py-8">
+                  <div className="flex justify-center mb-1 md:mb-2 animate-bounce">
+                    <Icons.Music className="w-16 h-16 md:w-20 md:h-20 text-retro-primary/80" />
                   </div>
-                  <div className="text-retro-primary font-display font-black text-3xl tracking-wider drop-shadow-[0_0_20px_rgba(205,86,86,0.4)]">
-                    MYSTERY MIX
+                  <div className="text-retro-bg font-mono text-xs md:text-sm font-bold opacity-90">INSERT COIN TO GET</div>
+                  <div className="text-retro-primary font-display font-black text-xl md:text-4xl tracking-wider drop-shadow-[0_0_20px_rgba(205,86,86,0.4)] leading-tight">
+                    MYSTERY<br/>MIX
                   </div>
-                  <div className="text-[11px] text-retro-bg/40 font-mono mt-6 space-y-1">
-                    <div>[ POWERED BY LAST.FM × SPOTIFY ]</div>
+                  <div className="text-[9px] md:text-[11px] text-retro-bg/40 font-mono mt-4 md:mt-6 space-y-1">
+                    <div>[ POWERED BY LAST.FM AND SPOTIFY ]</div>
                     <div className="text-amber-400/60 font-bold">💰 COST: 50 CENTS</div>
                   </div>
                 </div>
               ) : status === "SERVED" && recommendations.length > 0 ? (
-                <div className="space-y-3">
+                <div className="space-y-2 md:space-y-3 pb-2">
                   {seedInfo && (
-                    <div className="flex items-center gap-2 bg-linear-to-r from-retro-primary/20 to-transparent p-2.5 rounded-lg border-2 border-retro-primary/40 mb-4">
-                      {seedInfo.image && (
-                        <Image 
-                          src={seedInfo.image} 
-                          width={40} 
-                          height={40} 
-                          alt="seed"
-                          className="rounded border-2 border-retro-primary shadow-md" 
-                        />
-                      )}
+                    <div className="flex items-center gap-2 bg-linear-to-r from-retro-primary/20 to-transparent p-2 rounded-lg border-2 border-retro-primary/40 mb-2 md:mb-4 sticky top-0 bg-gray-900/90 backdrop-blur-sm z-30">
+                      <div className="shrink-0">
+                         {seedInfo.image && <Image src={seedInfo.image} width={28} height={28} alt="seed" className="rounded border border-retro-primary w-7 h-7 md:w-8 md:h-8" /> }
+                      </div>
                       <div className="flex-1 overflow-hidden">
-                        <p className="text-[9px] text-retro-primary/80 font-mono font-bold">BASED ON:</p>
-                        <p className="text-xs font-bold text-retro-light truncate">{seedInfo.name}</p>
+                        <p className="text-[7px] md:text-[8px] text-retro-primary/80 font-mono font-bold">BASED ON:</p>
+                        <p className="text-[10px] md:text-xs font-bold text-retro-light truncate">{seedInfo.name}</p>
                       </div>
                     </div>
                   )}
                   
                   {recommendations.map((track, idx) => (
-                    <div 
-                      key={track.id} 
-                      className="flex items-center justify-between bg-linear-to-r from-retro-bg/20 to-transparent p-3 rounded-xl border-2 border-retro-bg/30 hover:border-retro-light/60 transition-all hover:scale-[1.02] group"
-                    >
-                      <div className="flex items-center gap-3 overflow-hidden flex-1">
+                    <div key={track.id} className="flex items-center justify-between bg-linear-to-r from-retro-bg/20 to-transparent p-2 rounded-xl border-2 border-retro-bg/30 hover:border-retro-light/60 transition-all active:scale-[0.98]">
+                      <div className="flex items-center gap-2 md:gap-3 overflow-hidden flex-1">
                         <div className="relative shrink-0">
-                          <Image 
-                            src={track.album.images[0]?.url || '/placeholder.png'} 
-                            width={56} 
-                            height={56} 
-                            alt={track.name}
-                            className="rounded-lg border-2 border-retro-bg/50 shadow-xl" 
-                          />
-                          <div className="absolute -top-2 -left-2 bg-linear-to-br from-retro-primary to-retro-dark text-retro-bg text-xs font-black px-2 py-1 rounded-full border-2 border-retro-text shadow-lg">
+                          <Image src={track.album.images[0]?.url || '/placeholder.png'} width={40} height={40} alt={track.name} className="rounded-lg border-2 border-retro-bg/50 w-10 h-10 md:w-12 md:h-12" />
+                          <div className="absolute -top-1.5 -left-1.5 bg-retro-primary text-retro-bg text-[8px] md:text-[10px] font-black px-1.5 py-0.5 rounded-full border border-retro-text shadow-sm">
                             {idx + 1}
                           </div>
                         </div>
-                        <div className="overflow-hidden flex-1 min-w-0">
-                          <p className="text-sm font-bold text-retro-light truncate group-hover:text-retro-primary transition-colors">
-                            {track.name}
-                          </p>
-                          <p className="text-xs text-retro-bg/70 truncate">{track.artists[0].name}</p>
-                          <p className="text-[10px] text-retro-bg/50 truncate">{track.album.name}</p>
+                        <div className="overflow-hidden flex-1 min-w-0 pr-1">
+                          <p className="text-xs md:text-sm font-bold text-retro-light truncate">{track.name}</p>
+                          <p className="text-[10px] md:text-xs text-retro-bg/70 truncate">{track.artists[0].name}</p>
                         </div>
                       </div>
-                      <div className="flex gap-1.5 shrink-0 ml-2">
-                        <button 
-                          onClick={() => openInSpotify(track.uri)}
-                          className="text-xs bg-linear-to-br from-green-600 to-green-800 text-white px-2.5 py-2 font-black hover:brightness-110 transition-all hover:scale-110 rounded-lg shadow-lg border-2 border-retro-text"
-                          title="Open in Spotify"
-                        >
-                          ▶
+                      
+                      <div className="flex flex-col gap-1.5 shrink-0 ml-1">
+                        <button onClick={() => openInSpotify(track.uri)} className="h-7 w-7 md:h-8 md:w-8 flex items-center justify-center bg-green-600 text-white rounded-lg border-b-2 border-green-800 active:border-b-0 active:translate-y-0.5" title="Play">
+                          <Icons.Play className="w-3 h-3 md:w-4 md:h-4" />
                         </button>
                         {isPremium && (
-                          <button 
-                            onClick={() => tryAddToQueue(track.uri)}
-                            className="text-xs bg-linear-to-br from-retro-light to-retro-dark text-white px-2.5 py-2 font-black hover:brightness-110 transition-all hover:scale-110 rounded-lg shadow-lg border-2 border-retro-text"
-                            title="Add to Queue (Premium Only)"
-                          >
-                            +Q
+                          <button onClick={() => tryAddToQueue(track.uri)} className="h-7 w-7 md:h-8 md:w-8 flex items-center justify-center bg-retro-light text-white rounded-lg border-b-2 border-retro-dark active:border-b-0 active:translate-y-0.5" title="Queue">
+                            <Icons.Plus className="w-3 h-3 md:w-4 md:h-4" />
                           </button>
                         )}
                       </div>
@@ -470,81 +447,86 @@ export default function VendingMachine() {
                   ))}
                 </div>
               ) : status === "ERROR" ? (
-                <div className="text-center py-12">
-                  <div className="text-retro-primary font-display text-2xl font-black mb-3 animate-pulse">
-                    ⚠️ OUT OF STOCK
-                  </div>
-                  <div className="text-retro-light/70 text-sm">(SYSTEM ERROR)</div>
-                  <div className="text-xs text-retro-bg/40 mt-4 font-mono">Please try again</div>
+                <div className="text-center py-8 md:py-12">
+                   <div className="flex justify-center mb-2 md:mb-3">
+                      <Icons.Warning className="w-10 h-10 md:w-12 md:h-12 text-retro-primary animate-pulse" />
+                   </div>
+                  <div className="text-retro-primary font-display text-xl md:text-2xl font-black mb-1">OUT OF STOCK</div>
+                  <div className="text-retro-light/70 text-xs md:text-sm">(SYSTEM ERROR)</div>
+                  <div className="text-[10px] md:text-xs text-retro-bg/40 mt-3 md:mt-4 font-mono">Tap button to retry</div>
                 </div>
               ) : null}
             </div>
           </div>
 
-          {/* === BIG RED BUTTON - Classic 90s Style === */}
-          <div className="space-y-3 mb-5">
+          {/* === BUTTON & PANEL === */}
+          <div className="space-y-2 md:space-y-3 mb-4 md:mb-5">
             <button
               onClick={dispenseMix}
               disabled={loading}
               className={`
-                w-full py-5 bg-linear-to-b from-retro-light via-retro-primary to-retro-dark text-retro-bg font-display font-black text-xl uppercase tracking-widest 
+                w-full py-3 md:py-5 bg-linear-to-b from-retro-light via-retro-primary to-retro-dark 
+                text-retro-bg font-display font-black text-base md:text-xl uppercase tracking-widest 
                 rounded-xl border-4 border-retro-text
-                shadow-[0_8px_0px_0px_rgba(62,39,35,1)] 
+                shadow-[0_4px_0px_0px_rgba(62,39,35,1)] md:shadow-[0_6px_0px_0px_rgba(62,39,35,1)]
                 active:translate-y-1.5 active:shadow-[0_2px_0px_0px_rgba(62,39,35,1)] 
                 transition-all duration-100
                 ${loading ? "opacity-50 cursor-not-allowed" : "hover:brightness-110"}
-                relative overflow-hidden group
+                relative overflow-hidden group touch-manipulation
               `}
             >
               <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-              
-              <span className="relative z-10 drop-shadow-[0_3px_6px_rgba(0,0,0,0.5)] flex items-center justify-center gap-3">
+              <span className="relative z-10 drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)] flex items-center justify-center gap-2">
                 {loading ? (
-                  <>
-                    <span className="animate-spin">⚙️</span>
-                    <span>BREWING...</span>
-                  </>
+                  <><Icons.Gear className="w-4 h-4 md:w-5 md:h-5 animate-spin" /><span>BREWING...</span></>
                 ) : (
-                  <>
-                    <span>🎲</span>
-                    <span>DISPENSE MIX</span>
-                  </>
+                  <><Icons.Dice className="w-6 h-6 md:w-5 md:h-5" /><span>DISPENSE MIX</span></>
                 )}
               </span>
             </button>
 
-            {/* Status Panel - LCD Style */}
-            <div className="bg-black/40 rounded-lg p-2.5 border-2 border-retro-text shadow-inner">
-              <div className="flex items-center justify-between text-[9px] font-mono text-amber-400/80 font-bold">
-                <div className="flex items-center gap-2">
-                  <div className={`w-2.5 h-2.5 rounded-full border border-retro-text ${
+            {/* Status Panel */}
+            <div className="bg-black/40 rounded-lg p-2 md:p-2.5 border-2 border-retro-text shadow-inner">
+              <div className="flex items-center justify-between text-[7px] md:text-[9px] font-mono text-amber-400/80 font-bold">
+                <div className="flex items-center gap-1.5 md:gap-2">
+                  <div className={`w-2 h-2 md:w-2.5 md:h-2.5 rounded-full border border-retro-text ${
                     status === 'IDLE' ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.8)]' : 
                     status === 'BREWING' ? 'bg-amber-500 animate-pulse shadow-[0_0_8px_rgba(245,158,11,0.8)]' : 
                     status === 'SERVED' ? 'bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.8)]' : 
-                    'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)]'
+                    'bg-red-500'
                   }`}></div>
                   <span>STATUS: {status}</span>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 md:gap-3">
                   <span>SEEDS: {usedTrackIds.length}/20</span>
-                  {isPremium && <span className="text-amber-300">★ PREMIUM</span>}
+                  {isPremium && (
+                    <div className="items-center gap-1 text-amber-300 hidden md:flex">
+                        <Icons.Star className="w-3 h-3" /> <span>PREMIUM</span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
           </div>
 
-          {/* === DISPENSE TRAY === */}
+          {/* === TRAY === */}
           <div className="relative">
-            <div className="mx-auto w-4/5 h-6 bg-linear-to-b from-gray-800 to-black rounded-b-xl border-3 border-retro-text border-t-0 shadow-inner flex items-end justify-center pb-1">
-              <div className="text-[8px] text-gray-600 font-mono font-bold tracking-wider">PICKUP</div>
+            <div className="mx-auto w-4/5 h-4 md:h-6 bg-linear-to-b from-gray-800 to-black rounded-b-xl border-3 border-retro-text border-t-0 shadow-inner flex items-end justify-center pb-1">
+              <div className="text-[6px] md:text-[8px] text-gray-600 font-mono font-bold tracking-wider">PICKUP</div>
             </div>
           </div>
 
         </div>
-
       </div>
 
       <style jsx>{`
+        .no-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
+        .no-scrollbar {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
         @keyframes coin-drop {
           0% { transform: translateY(-100px) rotate(0deg); opacity: 1; }
           100% { transform: translateY(200px) rotate(720deg); opacity: 0; }
@@ -559,22 +541,9 @@ export default function VendingMachine() {
           50% { transform: translateY(10px); opacity: 1; }
           100% { transform: translateY(0); }
         }
-        @keyframes shine {
-          0% { transform: translateX(-100%); }
-          100% { transform: translateX(100%); }
-        }
-        .animate-coin-drop {
-          animation: coin-drop 0.8s ease-in forwards;
-        }
-        .animate-shake {
-          animation: shake 0.1s infinite;
-        }
-        .animate-item-drop {
-          animation: item-drop 0.8s ease-out forwards;
-        }
-        .animate-shine {
-          animation: shine 3s linear infinite;
-        }
+        .animate-coin-drop { animation: coin-drop 0.8s ease-in forwards; }
+        .animate-shake { animation: shake 0.1s infinite; }
+        .animate-item-drop { animation: item-drop 0.8s ease-out forwards; }
       `}</style>
     </div>
   );

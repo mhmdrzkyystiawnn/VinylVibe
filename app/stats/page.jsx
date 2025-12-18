@@ -117,10 +117,10 @@ export default function StatsPage() {
       <div className="fixed top-0 left-0 right-0 bg-retro-dark text-retro-bg py-2 overflow-hidden z-40 border-b-4 border-retro-text shadow-lg">
         <div className="flex whitespace-nowrap animate-marquee">
           <span className="inline-block px-8 font-display font-black text-sm uppercase tracking-wider">
-            STATS CENTER - YOUR MUSIC DNA - POWERED BY SPOTIFY - VINYLVIBE ANALYTICS v1.0
+            STATS CENTER - YOUR MUSIC DNA - POWERED BY SPOTIFY AND LAST.FM - VINYLVIBE ANALYTICS v1.0
           </span>
           <span className="inline-block px-8 font-display font-black text-sm uppercase tracking-wider">
-            STATS CENTER - YOUR MUSIC DNA - POWERED BY SPOTIFY - VINYLVIBE ANALYTICS v1.0
+            STATS CENTER - YOUR MUSIC DNA - POWERED BY SPOTIFY AND LAST.FM - VINYLVIBE ANALYTICS v1.0
           </span>
         </div>
       </div>
@@ -189,7 +189,7 @@ export default function StatsPage() {
                       <p className="font-mono text-[10px] opacity-60 mt-1">{userProfile?.followers?.total} FOLLOWERS</p>
                     </div>
 
-                    {genres.length > 0 && activeTab === 'artists' && (
+                    {genres.length > 0 && (
                       <div className="mt-4 pt-4 border-t-2 border-dashed border-retro-text/30">
                         <h3 className="font-mono text-[10px] font-bold uppercase mb-2 text-center">TOP GENRES</h3>
                         <div className="flex flex-wrap gap-2 justify-center">
@@ -291,7 +291,6 @@ export default function StatsPage() {
                     ${activeTab === 'tracks' ? 'bg-retro-primary text-retro-bg' : 'bg-retro-bg text-retro-text hover:bg-retro-light/20'}
                   `}
                 >
-                  <span className="mr-2">🎵</span>
                   TOP TRACKS
                 </button>
                 <button 
@@ -301,7 +300,6 @@ export default function StatsPage() {
                     ${activeTab === 'artists' ? 'bg-retro-primary text-retro-bg' : 'bg-retro-bg text-retro-text hover:bg-retro-light/20'}
                   `}
                 >
-                  <span className="mr-2">🎤</span>
                   TOP ARTISTS
                 </button>
               </div>

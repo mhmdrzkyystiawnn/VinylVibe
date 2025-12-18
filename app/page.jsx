@@ -181,7 +181,7 @@ export default function Home() {
                 <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-radial from-retro-primary/10 to-transparent rounded-full blur-2xl"></div>
                 
                 <div className="flex items-center gap-4 mb-6 pb-4 border-b-4 border-double border-retro-text/20">
-                  <div className="w-12 h-12 bg-retro-dark border-4 border-retro-text rounded-full flex items-center justify-center shadow-lg relative">
+                  <div className="w-8 h-8 bg-retro-dark border-4 border-retro-text rounded-full flex items-center justify-center shadow-lg relative">
                     <div className="absolute inset-2 border-2 border-retro-bg/50 rounded-full"></div>
                     <span className="text-retro-bg font-black text-xl relative z-10">&#128191;</span>
                   </div>
@@ -210,7 +210,7 @@ export default function Home() {
                 <div className="absolute bottom-0 left-0 right-0 h-2 bg-retro-dark opacity-20"></div>
                 
                 <div className="flex items-center gap-4 mb-6 pb-4 border-b-4 border-double border-retro-text/20">
-                  <div className="w-12 h-12 bg-retro-light border-4 border-retro-text rounded-lg flex items-center justify-center shadow-lg">
+                  <div className="w-8 h-8 bg-retro-light border-4 border-retro-text rounded-lg flex items-center justify-center shadow-lg">
                     <span className="text-retro-bg font-black text-xl">&#127902;</span>
                   </div>
                   <div>
@@ -265,7 +265,7 @@ export default function Home() {
                 <div className="w-24 h-1 bg-retro-bg/50 rounded-full"></div>
               </div>
               <p className="font-mono text-xs text-retro-bg/70 uppercase tracking-widest">
-                Broadcasting Since {new Date().getFullYear()} - Powered by Spotify API
+                Broadcasting Since {new Date().getFullYear()} - Powered by Spotify API And Last.fm API
               </p>
             </div>
           </div>

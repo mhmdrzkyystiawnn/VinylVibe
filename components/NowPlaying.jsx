@@ -108,40 +108,50 @@ export default function NowPlaying() {
           <div className={`w-3 h-3 rounded-full border-2 border-retro-text ${
             isPlaying ? 'bg-green-500 animate-pulse shadow-[0_0_10px_rgba(34,197,94,0.8)]' : 'bg-gray-500'
           }`}></div>
-          <span className="text-[10px] font-mono font-bold text-green-400">
+          <span className="text-[10px] font-mono font-bold text-green-200">
             {loading ? "LOADING..." : isPlaying ? "PLAYING" : "PAUSED"}
           </span>
         </div>
 
-        {loading ? (
-          <div className="animate-pulse space-y-4">
+{loading ? (
+          // ... (Loading state tetap sama) ...
+           <div className="animate-pulse space-y-4">
              <div className="aspect-square bg-retro-text/10 border-2 border-dashed border-green-500/20 rounded-lg"></div>
              <div className="h-4 bg-retro-text/10 rounded"></div>
              <div className="h-3 bg-retro-text/5 rounded w-3/4"></div>
-          </div>
+           </div>
         ) : nowPlaying ? (
           <div className="relative z-10">
-            {/* Album Art - CD Style */}
+            
+            {/* --- BAGIAN YANG DIPERBAIKI --- */}
             <div className="aspect-square relative w-full mb-6 rounded-full overflow-hidden border-4 border-retro-text bg-black shadow-2xl group">
-              <Image
-                src={nowPlaying.album.images[0].url}
-                alt={nowPlaying.name}
-                width={640}
-                height={640}
-                priority
-                unoptimized
-                className={`w-full h-full object-cover transition-all duration-700 ${
-                  isPlaying ? 'animate-spin-slow' : 'grayscale'
-                }`}
-              />
               
-              {/* CD Center Hole */}
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              {/* PERBAIKAN 1 (Animasi v4): 
+                  Gunakan `animate-[spin_4s_linear_infinite]` langsung di className. 
+                  Kita bungkus Image dalam div wrapper untuk animasinya.
+              */}
+              <div className={`relative w-full h-full bg-black ${isPlaying ? 'animate-[spin_15s_linear_infinite]' : ''} scale-[1.05]`}>
+                 {/* PERBAIKAN 2 (Image Fit): 
+                     Gunakan prop `fill` dan class `object-cover`.
+                 */}
+                 <Image
+                    src={nowPlaying.album.images[0].url}
+                    alt={nowPlaying.name}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 400px"
+                    priority
+                    unoptimized
+                    className={`object-cover ${!isPlaying ? 'grayscale' : ''}`}
+                  />
+              </div>
+
+              {/* Center Hole (Layer Paling Atas - Tidak ikut muter) */}
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
                 <div className="w-16 h-16 rounded-full bg-gray-900 border-4 border-retro-text shadow-inner"></div>
               </div>
-              
-              {/* Scanline Effect */}
-              <div className="absolute inset-0 bg-[linear-gradient(rgba(0,255,0,0.03)_50%,transparent_50%)] bg-size-[100%_4px] pointer-events-none"></div>
+
+              {/* Scanline Effect (Layer Paling Atas) */}
+              <div className="absolute inset-0 bg-[linear-gradient(rgba(0,255,0,0.03)_50%,transparent_50%)] bg-size-[100%_4px] pointer-events-none z-10"></div>
             </div>
 
             {/* Track Info Display */}
@@ -186,16 +196,6 @@ export default function NowPlaying() {
           </div>
         )}
       </div>
-
-      <style jsx>{`
-        @keyframes spin-slow {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-        .animate-spin-slow {
-          animation: spin-slow 4s linear infinite;
-        }
-      `}</style>
     </div>
   );
 }

@@ -21,17 +21,17 @@ export default function Header({ user }) {
       </div>
 
       {/* Main Header Container */}
-      <div className="relative flex flex-col md:flex-row justify-between items-center gap-6">
+      <div className="relative flex flex-col md:flex-row justify-between items-center gap-1">
         
         {/* LEFT SIDE: Title & Branding */}
         <div className="flex-1 text-center md:text-left">
           <div className="relative inline-block">
             {/* Retro Badge */}
-            <div className="absolute -top-4 -left-4 bg-retro-primary text-retro-bg px-3 py-1 rotate-[-8deg] text-[10px] font-black uppercase border-2 border-retro-text shadow-lg z-10">
+            <div className="absolute -top-5 -left-4 bg-retro-primary text-retro-bg px-3 py-1 rotate-[-8deg] text-[10px] font-black uppercase border-2 border-retro-text shadow-lg z-10">
               LIVE
             </div>
             
-            <h1 className="text-5xl md:text-6xl font-black uppercase tracking-tighter leading-none text-retro-text font-display relative">
+            <h1 className="text-4xl md:text-6xl font-black uppercase tracking-tighter leading-none text-retro-text font-display relative">
               VINYL
               <span className="text-retro-primary">VIBE</span>
               <div className="absolute -bottom-2 left-0 right-0 h-1 bg-retro-primary"></div>
