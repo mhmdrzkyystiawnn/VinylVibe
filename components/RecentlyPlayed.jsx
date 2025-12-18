@@ -44,64 +44,77 @@ export default function RecentlyPlayed() {
   }, [session, spotify]);
 
   return (
-    <div>
-      <div className="text-center mb-6">
-        <span className="bg-retro-dark text-retro-bg px-2 py-1 text-xs font-mono uppercase tracking-widest">
+    <div className="w-full max-w-md mx-auto">
+      {/* HEADER LABEL */}
+      <div className="flex justify-center mb-4 relative z-10">
+        <div className="bg-retro-text text-retro-bg px-4 py-1 border-2 border-retro-bg text-xs font-bold font-mono uppercase tracking-widest shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)]">
           Log History
-        </span>
+        </div>
       </div>
 
-      <div className="bg-white/50 border-2 border-retro-dark p-6 relative">
-        {/* Hiasan Paku di pojok */}
-        <div className="absolute top-2 right-2 w-2 h-2 bg-retro-dark/30 rounded-full"></div>
-        <div className="absolute top-2 left-2 w-2 h-2 bg-retro-dark/30 rounded-full"></div>
+      {/* MAIN CONTAINER */}
+      <div className="relative bg-retro-bg border-3 border-retro-text p-6 shadow-[8px_8px_0px_0px_var(--color-retro-text)] transition-all duration-300">
+        
+        {/* Decorative Screws (Pojok-pojok) */}
+        <div className="absolute top-2 left-2 w-2 h-2 border border-retro-text rounded-full flex items-center justify-center"><div className="w-1 h-[1px] bg-retro-text transform -rotate-45"></div></div>
+        <div className="absolute top-2 right-2 w-2 h-2 border border-retro-text rounded-full flex items-center justify-center"><div className="w-1 h-[1px] bg-retro-text transform -rotate-45"></div></div>
+        <div className="absolute bottom-2 left-2 w-2 h-2 border border-retro-text rounded-full flex items-center justify-center"><div className="w-1 h-[1px] bg-retro-text transform -rotate-45"></div></div>
+        <div className="absolute bottom-2 right-2 w-2 h-2 border border-retro-text rounded-full flex items-center justify-center"><div className="w-1 h-[1px] bg-retro-text transform -rotate-45"></div></div>
 
         <ul className="space-y-4">
           {loading ? (
-             // SKELETON LOADER
+             /* === SKELETON LOADER (Retro Style) === */
              [...Array(5)].map((_, i) => (
-               <li key={i} className="flex items-center gap-3 animate-pulse opacity-50">
-                  <div className="w-10 h-10 bg-retro-dark/20 rounded-none"></div>
+               <li key={i} className="flex items-center gap-3 animate-pulse opacity-60">
+                  <div className="w-12 h-12 border-2 border-dashed border-retro-text/30 bg-retro-text/5"></div>
                   <div className="flex-1 space-y-2">
-                    <div className="h-3 w-3/4 bg-retro-dark/20 rounded"></div>
-                    <div className="h-2 w-1/3 bg-retro-dark/10 rounded"></div>
+                    <div className="h-3 w-3/4 bg-retro-text/20"></div>
+                    <div className="h-2 w-1/3 bg-retro-text/10"></div>
                   </div>
                </li>
              ))
           ) : recentTracks.length > 0 ? (
+            
+            /* === DATA LIST === */
             recentTracks.map((item, index) => (
-              <li key={index} className="flex items-center gap-3 group border-b border-retro-dark/10 last:border-0 pb-2 last:pb-0">
+              <li key={index} className="flex items-center gap-3 group border-b-2 border-dashed border-retro-text/20 last:border-0 pb-3 last:pb-0 hover:bg-retro-text/5 transition-colors p-1 rounded-sm">
+                
                 {/* Gambar Album */}
-                <div className="w-10 h-10 flex-shrink-0 border border-retro-dark relative overflow-hidden grayscale group-hover:grayscale-0 transition">
+                <div className="w-12 h-12 flex-shrink-0 border-2 border-retro-text relative overflow-hidden bg-black">
                   <Image
                     src={item.track.album.images[0].url}
                     alt={item.track.name}
-                    width={40}
-                    height={40}
+                    width={48}
+                    height={48}
                     unoptimized
-                    className="object-cover w-full h-full"
+                    className="object-cover w-full h-full grayscale group-hover:grayscale-0 transition-all duration-300"
                   />
                 </div>
 
                 {/* Info Lagu */}
                 <div className="flex-1 min-w-0">
-                  <p className="font-bold text-sm truncate text-retro-dark">
+                  <p className="font-display font-bold text-sm truncate text-retro-text uppercase tracking-tight group-hover:text-retro-primary transition-colors">
                     {item.track.name}
                   </p>
-                  <p className="text-xs truncate opacity-70">
+                  <p className="font-mono text-xs truncate opacity-70">
                     {item.track.artists[0].name}
                   </p>
                 </div>
 
-                {/* Waktu (Time Ago) */}
-                <div className="text-[10px] font-mono font-bold text-retro-primary bg-retro-dark/5 px-2 py-1 rounded-sm whitespace-nowrap">
-                   {getTimeAgo(item.played_at)}
+                {/* Waktu (Time Ago Badge) */}
+                <div className="flex-shrink-0">
+                    <div className="text-[10px] font-mono font-bold text-retro-bg bg-retro-text px-2 py-1 shadow-[2px_2px_0px_0px_rgba(0,0,0,0.15)] whitespace-nowrap transform group-hover:-translate-y-0.5 transition-transform">
+                       {getTimeAgo(item.played_at)}
+                    </div>
                 </div>
               </li>
             ))
           ) : (
-            <div className="text-center py-4 opacity-50 text-sm">
-              Belum ada riwayat lagu.
+            
+            /* === EMPTY STATE === */
+            <div className="text-center py-6 border-2 border-dashed border-retro-text/30 bg-retro-text/5">
+              <span className="text-2xl block mb-2 opacity-50">📂</span>
+              <p className="font-mono text-xs opacity-60 uppercase">No logs found.</p>
             </div>
           )}
         </ul>

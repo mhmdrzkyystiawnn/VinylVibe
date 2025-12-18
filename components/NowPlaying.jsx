@@ -51,9 +51,7 @@ export default function NowPlaying() {
             }
           } else {
             // KONDISI 2: DATA KOSONG (Pause lama / Idle)
-            // Ubah status jadi 'Tidak Main' (biar jadi abu-abu)
             setIsPlaying(false);
-            
             // PENTING: Jangan setNowPlaying(null)! 
             // Biarkan lagu terakhir tetap nampang di layar.
           }
@@ -95,35 +93,45 @@ export default function NowPlaying() {
   }, [isPlaying, nowPlaying]);
 
   return (
-    <div>
-      {/* HEADER STATUS */}
-      <div className="text-center mb-6">
-        <span className={`px-2 py-1 text-xs font-mono uppercase tracking-widest ${
-          isPlaying 
-            ? "bg-retro-dark text-retro-bg" // Kalau Play: Hitam
-            : "bg-gray-400 text-white"      // Kalau Pause: Abu-abu
-        }`}>
-          {loading ? "BOOTING..." : isPlaying ? "Currently Spinning" : "Player Paused"}
-        </span>
+    <div className="w-full max-w-md mx-auto">
+      {/* HEADER STATUS - Retro Label Style */}
+      <div className="flex justify-center mb-4 relative z-10">
+         <div className={`
+            px-4 py-1 border-2 border-retro-text text-xs font-bold font-mono uppercase tracking-widest shadow-[4px_4px_0px_0px_var(--color-retro-text)]
+            ${isPlaying ? "bg-retro-dark text-retro-bg" : "bg-zinc-400 text-retro-text"}
+         `}>
+          {loading ? "SYSTEM BOOT..." : isPlaying ? "● ON AIR" : "|| PAUSED"}
+        </div>
       </div>
 
-      {/* CARD UTAMA */}
-      <div className={`relative bg-retro-bg border-4 p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,0.1)] rounded-sm transition-colors duration-500 ${
-         isPlaying ? "border-retro-dark" : "border-gray-400" // Border jadi abu kalau pause
-      }`}>
+      {/* CARD UTAMA - Retro Box */}
+      <div className={`
+          relative bg-retro-bg border-3 border-retro-text p-6 
+          shadow-[8px_8px_0px_0px_var(--color-retro-text)] 
+          transition-all duration-300
+      `}>
         
+        {/* Decorative Screws (Pojok-pojok) */}
+        <div className="absolute top-2 left-2 w-2 h-2 border border-retro-text rounded-full flex items-center justify-center"><div className="w-1 h-[1px] bg-retro-text transform -rotate-45"></div></div>
+        <div className="absolute top-2 right-2 w-2 h-2 border border-retro-text rounded-full flex items-center justify-center"><div className="w-1 h-[1px] bg-retro-text transform -rotate-45"></div></div>
+        <div className="absolute bottom-2 left-2 w-2 h-2 border border-retro-text rounded-full flex items-center justify-center"><div className="w-1 h-[1px] bg-retro-text transform -rotate-45"></div></div>
+        <div className="absolute bottom-2 right-2 w-2 h-2 border border-retro-text rounded-full flex items-center justify-center"><div className="w-1 h-[1px] bg-retro-text transform -rotate-45"></div></div>
+
         {loading ? (
-          /* === 1. LOADING SKELETON === */
-          <div className="animate-pulse">
-            <div className="aspect-square w-full mb-6 bg-gray-200 relative overflow-hidden"></div>
-            <div className="h-6 w-3/4 bg-gray-200 mx-auto rounded mb-2"></div>
-            <div className="h-4 w-1/2 bg-gray-200 mx-auto rounded"></div>
+          /* === 1. LOADING SKELETON (Retro Style) === */
+          <div className="animate-pulse space-y-4">
+            <div className="aspect-square w-full border-2 border-dashed border-retro-text/30 bg-retro-text/5 flex items-center justify-center">
+                <span className="font-mono text-xs opacity-50">LOADING_DISC...</span>
+            </div>
+            <div className="h-6 w-3/4 bg-retro-text/20 mx-auto border border-retro-text/20"></div>
+            <div className="h-4 w-1/2 bg-retro-text/20 mx-auto border border-retro-text/20"></div>
           </div>
         ) : nowPlaying ? (
           
-          /* === 2. MUSIC PLAYER (AKTIF ATAU PAUSE) === */
+          /* === 2. MUSIC PLAYER === */
           <>
-            <div className="aspect-square relative w-full mb-6 border-2 border-retro-dark overflow-hidden group">
+            {/* Album Art Container */}
+            <div className="aspect-square relative w-full mb-6 border-3 border-retro-text group bg-black">
               <Image
                 src={nowPlaying.album.images[0].url}
                 alt={nowPlaying.name}
@@ -131,60 +139,65 @@ export default function NowPlaying() {
                 height={640}
                 priority
                 unoptimized
-                // LOGIC GRAYSCALE DISINI:
-                // Kalau !isPlaying (Pause), tambah class 'grayscale'
                 className={`w-full h-full object-cover transition-all duration-700 ${
-                  !isPlaying ? "grayscale brightness-90 blur-[1px]" : ""
+                  !isPlaying ? "grayscale brightness-75 contrast-125" : ""
                 }`}
               />
               
-              {/* Animasi Muter hanya muncul kalau isPlaying = TRUE */}
-              {isPlaying && (
-                <div className="absolute inset-0 rounded-full border-[50px] border-black/10 animate-spin-slow opacity-20 pointer-events-none"></div>
-              )}
+              {/* Scanline Overlay (Estetika Retro) */}
+              <div className="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] z-10 bg-[length:100%_2px,3px_100%] pointer-events-none opacity-20"></div>
 
-              {/* Icon Pause Besar saat lagu berhenti */}
+              {/* Pause Overlay */}
               {!isPlaying && (
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  <div className="w-16 h-16 bg-black/50 rounded-full flex items-center justify-center backdrop-blur-sm">
-                    <div className="w-4 h-8 bg-white/90 border-r-4 border-transparent mr-1"></div>
-                    <div className="w-4 h-8 bg-white/90 ml-1"></div>
-                  </div>
+                <div className="absolute inset-0 flex items-center justify-center z-20 bg-retro-text/20 backdrop-grayscale-[0.5]">
+                    <div className="w-16 h-16 bg-retro-text text-retro-bg flex items-center justify-center border-2 border-retro-bg shadow-[4px_4px_0px_0px_rgba(0,0,0,0.5)]">
+                        <div className="flex gap-2">
+                             <div className="w-3 h-8 bg-retro-bg"></div>
+                             <div className="w-3 h-8 bg-retro-bg"></div>
+                        </div>
+                    </div>
                 </div>
               )}
             </div>
 
-            <div className="text-center">
-              <h2 className="text-2xl font-display font-bold leading-tight mb-2 truncate">
+            {/* Info Track */}
+            <div className="text-center space-y-2 border-t-2 border-dashed border-retro-text/20 pt-4">
+              <h2 className="text-2xl md:text-3xl font-display font-black leading-none uppercase truncate tracking-tighter">
                 {nowPlaying.name}
               </h2>
-              <p className="text-md text-retro-primary font-mono border-t border-retro-light/50 inline-block pt-2 mt-1">
+              <p className="text-sm font-bold font-mono text-retro-primary uppercase tracking-wider">
                 {nowPlaying.artists.map((artist) => artist.name).join(", ")}
               </p>
             </div>
 
-            <div className="mt-8 flex items-center gap-3 text-xs font-mono">
-              <span className="w-10 text-right opacity-60">{formatTime(progress)}</span>
-              <div className="h-3 flex-1 bg-retro-dark/10 rounded-full overflow-hidden border border-retro-dark/20 relative">
+            {/* Progress Bar Retro */}
+            <div className="mt-6 flex items-center gap-3 text-xs font-mono font-bold">
+              <span className="w-10 text-right">{formatTime(progress)}</span>
+              
+              <div className="h-4 flex-1 bg-retro-bg border-2 border-retro-text relative shadow-[inset_2px_2px_0px_0px_rgba(0,0,0,0.1)]">
                 <div
-                  className={`h-full transition-all duration-1000 ease-linear ${
-                    isPlaying ? "bg-retro-primary" : "bg-gray-400"
+                  className={`h-full border-r-2 border-retro-text transition-all duration-1000 ease-linear relative ${
+                    isPlaying ? "bg-retro-primary" : "bg-zinc-400"
                   }`}
                   style={{
                     width: `${(progress / nowPlaying.duration_ms) * 100}%`,
                   }}
-                ></div>
+                >
+                    {/* Pattern garis-garis di dalam progress bar */}
+                    <div className="absolute inset-0 w-full h-full opacity-30 bg-[repeating-linear-gradient(45deg,transparent,transparent_2px,#000_2px,#000_4px)]"></div>
+                </div>
               </div>
-              <span className="w-10 opacity-60">{formatTime(nowPlaying.duration_ms)}</span>
+              
+              <span className="w-10">{formatTime(nowPlaying.duration_ms)}</span>
             </div>
           </>
         ) : (
           
-          /* === 3. STATE AWAL (Belum pernah play lagu sama sekali) === */
-          <div className="text-center py-12">
-            <div className="text-4xl mb-4 text-gray-300">💿</div>
-            <h3 className="text-xl font-bold font-display text-gray-400">No Signal</h3>
-            <p className="text-gray-400 mt-2 text-sm">Play Spotify to start...</p>
+          /* === 3. STATE NO SIGNAL === */
+          <div className="text-center py-12 flex flex-col items-center justify-center h-full border-2 border-dashed border-retro-text/30 bg-retro-text/5">
+            <div className="text-4xl mb-4 opacity-50 grayscale">💾</div>
+            <h3 className="text-xl font-bold font-display uppercase tracking-widest">System Idle</h3>
+            <p className="font-mono text-xs mt-2 opacity-70">WAITING FOR AUDIO STREAM...</p>
           </div>
         )}
       </div>
