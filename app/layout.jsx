@@ -1,5 +1,6 @@
 import "./globals.css";
 import { Providers } from "./providers";
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 export const metadata = {
   title: "VinylVibe",
@@ -20,6 +21,7 @@ export default function RootLayout({ children }) {
       <body className="antialiased bg-retro-bg text-retro-text font-body">
         <Providers>
           {children}
+          <SpeedInsights />
         </Providers>
       </body>
     </html>
