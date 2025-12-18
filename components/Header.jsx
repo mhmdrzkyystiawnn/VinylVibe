@@ -50,10 +50,10 @@ export default function Header({ user }) {
         <div className="flex items-center gap-4">
           
           {/* User Profile Card */}
-          <div className="bg-gradient-to-br from-retro-bg to-[#E5E6C1] border-4 border-retro-text rounded-lg p-3 shadow-[6px_6px_0px_0px_rgba(62,39,35,1)] flex items-center gap-3">
+          <div className="bg-linear-to-br from-retro-bg to-[#E5E6C1] border-4 border-retro-text rounded-lg p-3 shadow-[6px_6px_0px_0px_rgba(62,39,35,1)] flex items-center gap-3">
             
             {/* Profile Image */}
-            <div className="relative w-14 h-14 flex-shrink-0">
+            <div className="relative w-14 h-14 shrink-0">
               {userImg ? (
                 <Image
                   src={userImg}
@@ -84,8 +84,8 @@ export default function Header({ user }) {
             className="
               group relative w-14 h-14 bg-retro-dark border-4 border-retro-text rounded-full
               shadow-[4px_4px_0px_0px_rgba(62,39,35,1)]
-              hover:translate-y-[2px] hover:translate-x-[2px] hover:shadow-[2px_2px_0px_0px_rgba(62,39,35,1)]
-              active:translate-y-[4px] active:translate-x-[4px] active:shadow-none
+              hover:translate-y-0.5 hover:translate-x-0.5 hover:shadow-[2px_2px_0px_0px_rgba(62,39,35,1)]
+              active:translate-y-1 active:translate-x-1 active:shadow-none
               transition-all duration-100 ease-in-out
               flex items-center justify-center
             "
@@ -105,7 +105,7 @@ export default function Header({ user }) {
       </div>
 
       {/* Tape Strip Decoration - Bottom */}
-      <div className="mt-4 h-2 bg-gradient-to-r from-transparent via-retro-text/20 to-transparent"></div>
+      <div className="mt-4 h-2 bg-linear-to-r from-transparent via-retro-text/20 to-transparent"></div>
     </div>
   );
 }

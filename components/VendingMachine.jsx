@@ -233,7 +233,7 @@ export default function VendingMachine() {
             spotifyTracks.push(searchResult.body.tracks.items[0]);
             console.log(`✓ Found: ${track.name}`);
           }
-        } catch (err) {
+        } catch {
           console.log(`✗ Could not find: ${track.name}`);
         }
 
@@ -273,7 +273,7 @@ export default function VendingMachine() {
     }
   };
 
-  const openInSpotify = (uri, trackName) => {
+  const openInSpotify = (uri) => {
     const spotifyUrl = uri.replace('spotify:track:', 'https://open.spotify.com/track/');
     window.open(spotifyUrl, '_blank');
     
@@ -281,7 +281,7 @@ export default function VendingMachine() {
     setTimeout(() => playSound(1046, 0.1), 100);
   };
 
-  const tryAddToQueue = async (uri, trackName) => {
+  const tryAddToQueue = async (uri) => {
     if (!spotify) return;
     try {
         await spotify.addToQueue(uri);
@@ -301,7 +301,7 @@ export default function VendingMachine() {
       {/* Coin Animation */}
       {coinAnimation && (
         <div className="absolute top-20 left-1/2 -translate-x-1/2 z-50 animate-coin-drop pointer-events-none">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-yellow-300 via-yellow-500 to-yellow-700 border-4 border-yellow-900 shadow-2xl flex items-center justify-center text-yellow-900 font-black text-lg">
+          <div className="w-8 h-8 rounded-full bg-linear-to-br from-yellow-300 via-yellow-500 to-yellow-700 border-4 border-yellow-900 shadow-2xl flex items-center justify-center text-yellow-900 font-black text-lg">
             ¢
           </div>
         </div>
@@ -311,7 +311,7 @@ export default function VendingMachine() {
       <div className={`relative transition-transform duration-75 ${machineShake ? 'animate-shake' : ''}`}>
         
         {/* MAIN BODY - 90s Retro Machine */}
-        <div className="relative bg-gradient-to-b from-[#D4B896] via-retro-bg to-[#C4A57B] border-4 border-retro-text rounded-2xl p-6 shadow-[8px_8px_0px_0px_rgba(62,39,35,1)]">
+        <div className="relative bg-linear-to-b from-[#D4B896] via-retro-bg to-[#C4A57B] border-4 border-retro-text rounded-2xl p-6 shadow-[8px_8px_0px_0px_rgba(62,39,35,1)]">
           
           {/* Decorative Corner Brackets */}
           <div className="absolute top-2 left-2 w-4 h-4 border-l-2 border-t-2 border-retro-dark/50"></div>
@@ -320,14 +320,14 @@ export default function VendingMachine() {
           <div className="absolute bottom-2 right-2 w-4 h-4 border-r-2 border-b-2 border-retro-dark/50"></div>
 
           {/* Coin Slot */}
-          <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-30 bg-gradient-to-b from-gray-600 to-gray-900 px-4 py-2 rounded-t-xl border-3 border-retro-text shadow-lg">
+          <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-30 bg-linear-to-b from-gray-600 to-gray-900 px-4 py-2 rounded-t-xl border-3 border-retro-text shadow-lg">
             <div className="w-16 h-3 bg-black rounded-sm border border-gray-800 shadow-inner flex items-center justify-center">
               <div className="text-[8px] text-amber-500/70 font-mono font-bold">INSERT</div>
             </div>
           </div>
 
           {/* === DISPLAY WINDOW - CRT Monitor Style === */}
-          <div className="relative bg-gradient-to-b from-gray-900 via-black to-gray-900 border-4 border-retro-text rounded-xl p-5 min-h-[280px] mb-5 overflow-hidden shadow-[inset_0_0_30px_rgba(0,0,0,0.9)]">
+          <div className="relative bg-linear-to-b from-gray-900 via-black to-gray-900 border-4 border-retro-text rounded-xl p-5 min-h-70 mb-5 overflow-hidden shadow-[inset_0_0_30px_rgba(0,0,0,0.9)]">
             
             {/* CRT Screen Curvature Effect */}
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.3)_100%)] pointer-events-none"></div>
@@ -380,7 +380,7 @@ export default function VendingMachine() {
                         className="relative animate-item-drop"
                         style={{ animationDelay: `${i * 0.3}s` }}
                       >
-                        <div className="w-20 h-24 bg-gradient-to-br from-retro-light/40 to-retro-dark/40 border-4 border-retro-primary rounded-xl shadow-2xl flex items-center justify-center backdrop-blur-sm">
+                        <div className="w-20 h-24 bg-linear-to-br from-retro-light/40 to-retro-dark/40 border-4 border-retro-primary rounded-xl shadow-2xl flex items-center justify-center backdrop-blur-sm">
                           <div className="text-5xl">🎵</div>
                         </div>
                         <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-16 h-2 bg-black/60 rounded-full blur-md"></div>
@@ -405,7 +405,7 @@ export default function VendingMachine() {
               ) : status === "SERVED" && recommendations.length > 0 ? (
                 <div className="space-y-3">
                   {seedInfo && (
-                    <div className="flex items-center gap-2 bg-gradient-to-r from-retro-primary/20 to-transparent p-2.5 rounded-lg border-2 border-retro-primary/40 mb-4">
+                    <div className="flex items-center gap-2 bg-linear-to-r from-retro-primary/20 to-transparent p-2.5 rounded-lg border-2 border-retro-primary/40 mb-4">
                       {seedInfo.image && (
                         <Image 
                           src={seedInfo.image} 
@@ -425,10 +425,10 @@ export default function VendingMachine() {
                   {recommendations.map((track, idx) => (
                     <div 
                       key={track.id} 
-                      className="flex items-center justify-between bg-gradient-to-r from-retro-bg/20 to-transparent p-3 rounded-xl border-2 border-retro-bg/30 hover:border-retro-light/60 transition-all hover:scale-[1.02] group"
+                      className="flex items-center justify-between bg-linear-to-r from-retro-bg/20 to-transparent p-3 rounded-xl border-2 border-retro-bg/30 hover:border-retro-light/60 transition-all hover:scale-[1.02] group"
                     >
                       <div className="flex items-center gap-3 overflow-hidden flex-1">
-                        <div className="relative flex-shrink-0">
+                        <div className="relative shrink-0">
                           <Image 
                             src={track.album.images[0]?.url || '/placeholder.png'} 
                             width={56} 
@@ -436,7 +436,7 @@ export default function VendingMachine() {
                             alt={track.name}
                             className="rounded-lg border-2 border-retro-bg/50 shadow-xl" 
                           />
-                          <div className="absolute -top-2 -left-2 bg-gradient-to-br from-retro-primary to-retro-dark text-retro-bg text-xs font-black px-2 py-1 rounded-full border-2 border-retro-text shadow-lg">
+                          <div className="absolute -top-2 -left-2 bg-linear-to-br from-retro-primary to-retro-dark text-retro-bg text-xs font-black px-2 py-1 rounded-full border-2 border-retro-text shadow-lg">
                             {idx + 1}
                           </div>
                         </div>
@@ -448,18 +448,18 @@ export default function VendingMachine() {
                           <p className="text-[10px] text-retro-bg/50 truncate">{track.album.name}</p>
                         </div>
                       </div>
-                      <div className="flex gap-1.5 flex-shrink-0 ml-2">
+                      <div className="flex gap-1.5 shrink-0 ml-2">
                         <button 
-                          onClick={() => openInSpotify(track.uri, track.name)}
-                          className="text-xs bg-gradient-to-br from-green-600 to-green-800 text-white px-2.5 py-2 font-black hover:brightness-110 transition-all hover:scale-110 rounded-lg shadow-lg border-2 border-retro-text"
+                          onClick={() => openInSpotify(track.uri)}
+                          className="text-xs bg-linear-to-br from-green-600 to-green-800 text-white px-2.5 py-2 font-black hover:brightness-110 transition-all hover:scale-110 rounded-lg shadow-lg border-2 border-retro-text"
                           title="Open in Spotify"
                         >
                           ▶
                         </button>
                         {isPremium && (
                           <button 
-                            onClick={() => tryAddToQueue(track.uri, track.name)}
-                            className="text-xs bg-gradient-to-br from-retro-light to-retro-dark text-white px-2.5 py-2 font-black hover:brightness-110 transition-all hover:scale-110 rounded-lg shadow-lg border-2 border-retro-text"
+                            onClick={() => tryAddToQueue(track.uri)}
+                            className="text-xs bg-linear-to-br from-retro-light to-retro-dark text-white px-2.5 py-2 font-black hover:brightness-110 transition-all hover:scale-110 rounded-lg shadow-lg border-2 border-retro-text"
                             title="Add to Queue (Premium Only)"
                           >
                             +Q
@@ -487,16 +487,16 @@ export default function VendingMachine() {
               onClick={dispenseMix}
               disabled={loading}
               className={`
-                w-full py-5 bg-gradient-to-b from-retro-light via-retro-primary to-retro-dark text-retro-bg font-display font-black text-xl uppercase tracking-widest 
+                w-full py-5 bg-linear-to-b from-retro-light via-retro-primary to-retro-dark text-retro-bg font-display font-black text-xl uppercase tracking-widest 
                 rounded-xl border-4 border-retro-text
                 shadow-[0_8px_0px_0px_rgba(62,39,35,1)] 
-                active:translate-y-[6px] active:shadow-[0_2px_0px_0px_rgba(62,39,35,1)] 
+                active:translate-y-1.5 active:shadow-[0_2px_0px_0px_rgba(62,39,35,1)] 
                 transition-all duration-100
                 ${loading ? "opacity-50 cursor-not-allowed" : "hover:brightness-110"}
                 relative overflow-hidden group
               `}
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+              <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
               
               <span className="relative z-10 drop-shadow-[0_3px_6px_rgba(0,0,0,0.5)] flex items-center justify-center gap-3">
                 {loading ? (
@@ -535,7 +535,7 @@ export default function VendingMachine() {
 
           {/* === DISPENSE TRAY === */}
           <div className="relative">
-            <div className="mx-auto w-4/5 h-6 bg-gradient-to-b from-gray-800 to-black rounded-b-xl border-3 border-retro-text border-t-0 shadow-inner flex items-end justify-center pb-1">
+            <div className="mx-auto w-4/5 h-6 bg-linear-to-b from-gray-800 to-black rounded-b-xl border-3 border-retro-text border-t-0 shadow-inner flex items-end justify-center pb-1">
               <div className="text-[8px] text-gray-600 font-mono font-bold tracking-wider">PICKUP</div>
             </div>
           </div>

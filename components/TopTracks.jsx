@@ -47,15 +47,15 @@ export default function TopTracks() {
           topTracks.map((track, index) => (
             <li 
               key={track.id} 
-              className="group flex items-center gap-4 bg-gradient-to-r from-retro-bg to-transparent p-3 rounded-xl border-2 border-retro-text/30 hover:border-retro-primary hover:shadow-[4px_4px_0px_0px_rgba(62,39,35,0.3)] transition-all hover:translate-x-1"
+              className="group flex items-center gap-4 bg-linear-to-r from-retro-bg to-transparent p-3 rounded-xl border-2 border-retro-text/30 hover:border-retro-primary hover:shadow-[4px_4px_0px_0px_rgba(62,39,35,0.3)] transition-all hover:translate-x-1"
             >
               {/* Chart Position */}
-              <div className="flex-shrink-0 w-8 h-8 bg-retro-primary border-2 border-retro-text rounded-full flex items-center justify-center shadow-md">
+              <div className="shrink-0 w-8 h-8 bg-retro-primary border-2 border-retro-text rounded-full flex items-center justify-center shadow-md">
                 <span className="font-black text-retro-bg text-sm">{index + 1}</span>
               </div>
               
               {/* Album Art - Vinyl Style */}
-              <div className="relative w-14 h-14 flex-shrink-0">
+              <div className="relative w-14 h-14 shrink-0">
                 <div className="absolute inset-0 rounded-full border-4 border-retro-text bg-black overflow-hidden shadow-lg">
                   <Image 
                     src={track.album.images[0].url} 
@@ -81,13 +81,6 @@ export default function TopTracks() {
                   {track.artists[0].name}
                 </p>
               </div>
-
-              {/* Play Icon */}
-              <div className="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                <div className="w-8 h-8 bg-retro-dark border-2 border-retro-text rounded-full flex items-center justify-center">
-                  <span className="text-retro-bg text-xs">▶</span>
-                </div>
-              </div>
             </li>
           ))
         ) : (
@@ -103,22 +96,22 @@ export default function TopTracks() {
         <Link 
           href="/stats"
           className="
-            group relative w-full py-4 px-6 bg-gradient-to-r from-retro-light to-retro-primary text-retro-bg 
+            group relative w-full py-4 px-6 bg-linear-to-r from-retro-light to-retro-primary text-retro-bg 
             font-display font-black text-base uppercase tracking-wider text-center
             border-4 border-retro-text rounded-xl
             shadow-[6px_6px_0px_0px_rgba(62,39,35,1)]
-            hover:translate-y-[2px] hover:translate-x-[2px] hover:shadow-[4px_4px_0px_0px_rgba(62,39,35,1)]
-            active:translate-y-[4px] active:translate-x-[4px] active:shadow-[2px_2px_0px_0px_rgba(62,39,35,1)]
+            hover:translate-y-0.5 hover:translate-x-0.5 hover:shadow-[4px_4px_0px_0px_rgba(62,39,35,1)]
+            active:translate-y-1 active:translate-x-1 active:shadow-[2px_2px_0px_0px_rgba(62,39,35,1)]
             transition-all duration-100
             flex items-center justify-center gap-3
             overflow-hidden
           "
         >
           {/* Shine Effect */}
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+          <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
           
           <span className="relative z-10 flex items-center gap-2">
-            📊 VIEW FULL STATS
+             VIEW FULL STATS
           </span>
         </Link>
       </div>

@@ -1,5 +1,5 @@
 "use client";
-
+//ini page utama
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import useSpotify from "@/hooks/useSpotify";
@@ -14,17 +14,24 @@ export default function Home() {
   const { data: session } = useSession();
   const spotify = useSpotify();
   const [user, setUser] = useState(null);
-  const [mounted, setMounted] = useState(false);
   
-  const equalizerBars = useState(() => 
-    Array.from({ length: 12 }, () => ({
-      height: Math.random() * 60 + 40,
-      duration: Math.random() * 0.5 + 0.5
-    }))
-  )[0];
- // eslint-disable-next-line react-hooks/set-state-in-effect
+  // PERBAIKAN DI SINI:
+  // 1. Inisialisasi dengan array kosong agar Server & Client sepakat di awal (tidak ada mismatch)
+  const [equalizerBars, setEqualizerBars] = useState([]);
+
+// 2. Generate nilai random HANYA di Client setelah komponen dimuat
+  // Gunakan setTimeout agar update state tidak terjadi secara synchronous (memblokir render)
   useEffect(() => {
-    setMounted(true);
+    const timer = setTimeout(() => {
+      const bars = Array.from({ length: 12 }, () => ({
+        height: Math.random() * 60 + 40,
+        duration: Math.random() * 0.5 + 0.5
+      }));
+      setEqualizerBars(bars);
+    }, 0);
+
+    // Bersihkan timer jika komponen di-unmount
+    return () => clearTimeout(timer);
   }, []);
 
   useEffect(() => {
@@ -39,6 +46,7 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-retro-bg text-retro-text font-body relative selection:bg-retro-primary selection:text-retro-bg overflow-x-hidden">
       
+      {/* Background Pattern */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden opacity-[0.03]">
         <div className="absolute inset-0" 
              style={{
@@ -53,29 +61,32 @@ export default function Home() {
         />
       </div>
 
+      {/* Corner Decorations */}
       <div className="fixed top-4 left-4 w-16 h-16 border-l-4 border-t-4 border-retro-primary/30 pointer-events-none z-50"></div>
       <div className="fixed top-4 right-4 w-16 h-16 border-r-4 border-t-4 border-retro-primary/30 pointer-events-none z-50"></div>
       <div className="fixed bottom-4 left-4 w-16 h-16 border-l-4 border-b-4 border-retro-primary/30 pointer-events-none z-50"></div>
       <div className="fixed bottom-4 right-4 w-16 h-16 border-r-4 border-b-4 border-retro-primary/30 pointer-events-none z-50"></div>
 
+      {/* Marquee Header */}
       <div className="fixed top-0 left-0 right-0 bg-retro-dark text-retro-bg py-2 overflow-hidden z-40 border-b-4 border-retro-text shadow-lg">
         <div className="flex whitespace-nowrap animate-marquee">
           <span className="inline-block px-8 font-display font-black text-sm uppercase tracking-wider">
-            NOW PLAYING YOUR VIBE - POWERED BY SPOTIFY - 90s MUSIC EXPERIENCE - VINYLVIBE SYSTEM v1.0
+            NOW PLAYING YOUR VIBE - POWERED BY SPOTIFY AND LAST.FM - 90s MUSIC EXPERIENCE - VINYLVIBE SYSTEM v1.0
           </span>
           <span className="inline-block px-8 font-display font-black text-sm uppercase tracking-wider">
-            NOW PLAYING YOUR VIBE - POWERED BY SPOTIFY - 90s MUSIC EXPERIENCE - VINYLVIBE SYSTEM v1.0
+            NOW PLAYING YOUR VIBE - POWERED BY SPOTIFY AND LAST.FM - 90s MUSIC EXPERIENCE - VINYLVIBE SYSTEM v1.0
           </span>
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto relative z-10 px-4 md:px-8 pt-20 pb-12">
         
+        {/* Header Section */}
         <div className="mb-12 relative">
           <div className="absolute -top-4 left-0 w-12 h-12 border-4 border-retro-primary/20 rounded-full"></div>
           <div className="absolute -top-4 left-6 w-8 h-8 border-4 border-retro-dark/20 rounded-full"></div>
           
-          <div className="bg-gradient-to-r from-retro-bg via-[#E5E6C1] to-retro-bg border-4 border-retro-text rounded-2xl p-6 shadow-[8px_8px_0px_0px_rgba(62,39,35,1)] relative overflow-hidden">
+          <div className="bg-linear-to-r from-retro-bg via-[#E5E6C1] to-retro-bg border-4 border-retro-text rounded-2xl p-6 shadow-[8px_8px_0px_0px_rgba(62,39,35,1)] relative overflow-hidden">
             <div className="absolute top-4 left-8 w-16 h-16 border-4 border-retro-text/10 rounded-full"></div>
             <div className="absolute top-4 right-8 w-16 h-16 border-4 border-retro-text/10 rounded-full"></div>
             
@@ -83,18 +94,22 @@ export default function Home() {
           </div>
         </div>
 
+        {/* Main Grid Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
           
+          {/* Left Column (Control Panel) */}
           <div className="lg:col-span-5 w-full order-1 lg:order-1">
             
-            <div className="bg-gradient-to-b from-[#D4B896] to-[#C4A57B] border-8 border-retro-text rounded-3xl p-6 shadow-[12px_12px_0px_0px_rgba(62,39,35,1)] relative">
+            <div className="bg-linear-to-b from-[#D4B896] to-[#C4A57B] border-8 border-retro-text rounded-3xl p-6 shadow-[12px_12px_0px_0px_rgba(62,39,35,1)] relative">
               
+              {/* Vents Decoration */}
               <div className="absolute top-4 left-1/2 -translate-x-1/2 flex gap-2">
                 {[...Array(8)].map((_, i) => (
                   <div key={i} className="w-1 h-6 bg-retro-text/20 rounded-full"></div>
                 ))}
               </div>
 
+              {/* Status Lights */}
               <div className="absolute top-6 right-6 flex gap-2">
                 <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.8)]"></div>
                 <div className="w-3 h-3 bg-retro-primary rounded-full animate-pulse shadow-[0_0_8px_rgba(205,86,86,0.8)]"></div>
@@ -116,19 +131,22 @@ export default function Home() {
                   </div>
                 </div>
                 
+                {/* Now Playing Component */}
                 <div className="relative">
-                  <div className="absolute -left-3 -top-3 bg-retro-dark text-retro-bg px-2 py-1 text-[10px] font-black rounded border-2 border-retro-text shadow-md">
+                  <div className="absolute -left-3 -top-3 bg-retro-dark text-retro-bg px-2 py-1 text-[10px] font-black rounded border-2 border-retro-text shadow-md z-1000">
                     DECK A
                   </div>
                   <NowPlaying />
                 </div>
                 
+                {/* Divider */}
                 <div className="flex items-center gap-4 py-3">
-                  <div className="h-px bg-gradient-to-r from-transparent via-retro-text/30 to-transparent flex-1"></div>
+                  <div className="h-px bg-linear-to-r from-transparent via-retro-text/30 to-transparent flex-1"></div>
                   <div className="text-2xl">&#127902;</div>
-                  <div className="h-px bg-gradient-to-r from-transparent via-retro-text/30 to-transparent flex-1"></div>
+                  <div className="h-px bg-linear-to-r from-transparent via-retro-text/30 to-transparent flex-1"></div>
                 </div>
 
+                {/* Vending Machine Component */}
                 <div className="relative">
                   <div className="absolute -left-3 -top-3 bg-retro-primary text-retro-bg px-2 py-1 text-[10px] font-black rounded border-2 border-retro-text shadow-md z-10">
                     DECK B
@@ -136,11 +154,12 @@ export default function Home() {
                   <VendingMachine />
                 </div>
 
+                {/* Equalizer Visualizer (The Fix Applied Here) */}
                 <div className="flex items-end justify-center gap-1 h-12 pt-4 border-t-2 border-retro-text/20">
                   {equalizerBars.map((bar, i) => (
                     <div 
                       key={i} 
-                      className="w-3 bg-gradient-to-t from-retro-primary to-retro-light rounded-t"
+                      className="w-3 bg-linear-to-t from-retro-primary to-retro-light rounded-t"
                       style={{ 
                         height: `${bar.height}%`,
                         animation: `equalizer ${bar.duration}s ease-in-out infinite alternate`
@@ -152,10 +171,12 @@ export default function Home() {
             </div>
           </div>
 
+          {/* Right Column (Content) */}
           <div className="lg:col-span-7 w-full order-2 lg:order-2 space-y-12">
             
+            {/* Top Tracks Section */}
             <section className="relative">
-              <div className="bg-gradient-to-br from-retro-bg to-[#E5E6C1] border-4 border-retro-text rounded-2xl p-6 shadow-[8px_8px_0px_0px_rgba(62,39,35,1)] relative overflow-hidden">
+              <div className="bg-linear-to-br from-retro-bg to-[#E5E6C1] border-4 border-retro-text rounded-2xl p-6 shadow-[8px_8px_0px_0px_rgba(62,39,35,1)] relative overflow-hidden">
                 
                 <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-radial from-retro-primary/10 to-transparent rounded-full blur-2xl"></div>
                 
@@ -181,8 +202,9 @@ export default function Home() {
               </div>
             </section>
 
+            {/* Recently Played Section */}
             <section className="relative">
-              <div className="bg-gradient-to-br from-[#E5E6C1] to-retro-bg border-4 border-retro-text rounded-2xl p-6 shadow-[8px_8px_0px_0px_rgba(62,39,35,1)] relative overflow-hidden">
+              <div className="bg-linear-to-br from-[#E5E6C1] to-retro-bg border-4 border-retro-text rounded-2xl p-6 shadow-[8px_8px_0px_0px_rgba(62,39,35,1)] relative overflow-hidden">
                 
                 <div className="absolute top-0 left-0 right-0 h-2 bg-retro-dark opacity-20"></div>
                 <div className="absolute bottom-0 left-0 right-0 h-2 bg-retro-dark opacity-20"></div>
@@ -212,8 +234,9 @@ export default function Home() {
 
         </div>
 
+        {/* Footer Station Badge */}
         <div className="mt-20 relative">
-          <div className="bg-gradient-to-r from-retro-dark via-retro-primary to-retro-dark border-4 border-retro-text rounded-2xl p-6 shadow-[8px_8px_0px_0px_rgba(62,39,35,1)] text-center relative overflow-hidden">
+          <div className="bg-linear-to-r from-retro-dark via-retro-primary to-retro-dark border-4 border-retro-text rounded-2xl p-6 shadow-[8px_8px_0px_0px_rgba(62,39,35,1)] text-center relative overflow-hidden">
             
             <div className="absolute inset-0 flex items-center justify-center opacity-10">
               {[...Array(3)].map((_, i) => (

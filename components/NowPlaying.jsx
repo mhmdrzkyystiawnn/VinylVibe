@@ -97,7 +97,7 @@ export default function NowPlaying() {
     <div className="w-full">
       
       {/* CD Player Display Screen */}
-      <div className="relative bg-gradient-to-br from-gray-900 to-black border-4 border-retro-text rounded-2xl p-6 shadow-[8px_8px_0px_0px_rgba(62,39,35,1)] overflow-hidden">
+      <div className="relative bg-linear-to-br from-gray-900 to-black border-4 border-retro-text rounded-2xl p-6 shadow-[8px_8px_0px_0px_rgba(62,39,35,1)] overflow-hidden">
         
         {/* LCD Screen Effect */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.3)_100%)] pointer-events-none"></div>
@@ -141,7 +141,7 @@ export default function NowPlaying() {
               </div>
               
               {/* Scanline Effect */}
-              <div className="absolute inset-0 bg-[linear-gradient(rgba(0,255,0,0.03)_50%,transparent_50%)] bg-[length:100%_4px] pointer-events-none"></div>
+              <div className="absolute inset-0 bg-[linear-gradient(rgba(0,255,0,0.03)_50%,transparent_50%)] bg-size-[100%_4px] pointer-events-none"></div>
             </div>
 
             {/* Track Info Display */}
@@ -162,7 +162,7 @@ export default function NowPlaying() {
                   <div
                     className={`h-full transition-all duration-1000 ease-linear relative ${
                       isPlaying 
-                        ? 'bg-gradient-to-r from-green-600 via-green-400 to-green-300' 
+                        ? 'bg-linear-to-r from-green-600 via-green-400 to-green-300' 
                         : 'bg-gray-600'
                     }`}
                     style={{ width: `${(progress / nowPlaying.duration_ms) * 100}%` }}
