@@ -1,17 +1,14 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
 import { useSession } from "next-auth/react";
-import useSpotify from "../hooks/useSpotify"; // Relative path
+import useSpotify from "../hooks/useSpotify";
 import Image from "next/image";
 
 export default function NowPlaying() {
   const { data: session } = useSession();
-  
-  // PERBAIKAN: Panggil hook secara langsung, jangan pakai ternary operator
   const spotify = useSpotify();
   
   const [nowPlaying, setNowPlaying] = useState(null);
-  // State audioFeatures dihapus karena fitur mood dihilangkan
   const [progress, setProgress] = useState(0);
   const [loading, setLoading] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -29,9 +26,7 @@ export default function NowPlaying() {
     progressRef.current = progress;
   }, [progress]);
 
-  // LOGIC 1: POLLING LAGU UTAMA (Cek lagu apa yang diputar)
   useEffect(() => {
-    // Tambahkan pengecekan 'spotify' disini
     if (!spotify || !spotify.getAccessToken()) return;
 
     let pollInterval = null;
@@ -42,7 +37,6 @@ export default function NowPlaying() {
       try {
         const data = await spotify.getMyCurrentPlayingTrack();
         
-        // Cek status 204 (No Content) atau body kosong
         if (data.statusCode === 204 || !data.body) {
            setIsPlaying(false);
            setLoading(false);
@@ -50,13 +44,12 @@ export default function NowPlaying() {
         }
 
         if (data.body && data.body.item) {
-          setNowPlaying(data.body.item); // Update state lagu
+          setNowPlaying(data.body.item);
           setIsPlaying(data.body.is_playing);
 
           const serverProgress = data.body.progress_ms;
           const currentLocalProgress = progressRef.current;
 
-          // Sync hanya jika selisih waktu > 2 detik
           if (Math.abs(serverProgress - currentLocalProgress) > 2000) {
             setProgress(serverProgress);
           }
@@ -87,7 +80,6 @@ export default function NowPlaying() {
     };
   }, [session, spotify]);
 
-  // LOGIC 2: TIMER LOKAL
   useEffect(() => {
     let timerInterval = null;
     if (isPlaying && nowPlaying) {
@@ -102,37 +94,35 @@ export default function NowPlaying() {
   }, [isPlaying, nowPlaying]);
 
   return (
-    <div className="w-full max-w-md mx-auto">
-      {/* HEADER STATUS */}
-      <div className="flex justify-center mb-4 relative z-10">
-         <div className={`
-            px-4 py-1 border-2 border-retro-text text-xs font-bold font-mono uppercase tracking-widest shadow-[4px_4px_0px_0px_var(--color-retro-text)]
-            ${isPlaying ? "bg-retro-dark text-retro-bg" : "bg-zinc-400 text-retro-text"}
-         `}>
-          {loading ? "SYSTEM BOOT..." : isPlaying ? "● ON AIR" : "|| PAUSED"}
-        </div>
-      </div>
+    <div className="w-full">
+      
+      {/* CD Player Display Screen */}
+      <div className="relative bg-gradient-to-br from-gray-900 to-black border-4 border-retro-text rounded-2xl p-6 shadow-[8px_8px_0px_0px_rgba(62,39,35,1)] overflow-hidden">
+        
+        {/* LCD Screen Effect */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.3)_100%)] pointer-events-none"></div>
+        <div className="absolute inset-0 bg-[repeating-linear-gradient(0deg,rgba(0,255,0,0.03),rgba(0,255,0,0.03)_1px,transparent_1px,transparent_2px)] pointer-events-none"></div>
 
-      {/* CARD UTAMA */}
-      <div className={`
-          relative bg-retro-bg border-3 border-retro-text p-6 
-          shadow-[8px_8px_0px_0px_var(--color-retro-text)] 
-          transition-all duration-300
-      `}>
-        {/* Dekorasi Baut */}
-        <div className="absolute top-2 left-2 w-2 h-2 border border-retro-text rounded-full flex items-center justify-center"><div className="w-1 h-[1px] bg-retro-text transform -rotate-45"></div></div>
-        <div className="absolute top-2 right-2 w-2 h-2 border border-retro-text rounded-full flex items-center justify-center"><div className="w-1 h-[1px] bg-retro-text transform -rotate-45"></div></div>
-        <div className="absolute bottom-2 left-2 w-2 h-2 border border-retro-text rounded-full flex items-center justify-center"><div className="w-1 h-[1px] bg-retro-text transform -rotate-45"></div></div>
-        <div className="absolute bottom-2 right-2 w-2 h-2 border border-retro-text rounded-full flex items-center justify-center"><div className="w-1 h-[1px] bg-retro-text transform -rotate-45"></div></div>
+        {/* Status LED */}
+        <div className="absolute top-4 right-4 flex items-center gap-2 z-10">
+          <div className={`w-3 h-3 rounded-full border-2 border-retro-text ${
+            isPlaying ? 'bg-green-500 animate-pulse shadow-[0_0_10px_rgba(34,197,94,0.8)]' : 'bg-gray-500'
+          }`}></div>
+          <span className="text-[10px] font-mono font-bold text-green-400">
+            {loading ? "LOADING..." : isPlaying ? "PLAYING" : "PAUSED"}
+          </span>
+        </div>
 
         {loading ? (
           <div className="animate-pulse space-y-4">
-             <div className="aspect-square bg-retro-text/10 border-2 border-dashed border-retro-text/20"></div>
+             <div className="aspect-square bg-retro-text/10 border-2 border-dashed border-green-500/20 rounded-lg"></div>
+             <div className="h-4 bg-retro-text/10 rounded"></div>
+             <div className="h-3 bg-retro-text/5 rounded w-3/4"></div>
           </div>
         ) : nowPlaying ? (
-          <>
-            {/* Album Art */}
-            <div className="aspect-square relative w-full mb-6 border-3 border-retro-text group bg-black">
+          <div className="relative z-10">
+            {/* Album Art - CD Style */}
+            <div className="aspect-square relative w-full mb-6 rounded-full overflow-hidden border-4 border-retro-text bg-black shadow-2xl group">
               <Image
                 src={nowPlaying.album.images[0].url}
                 alt={nowPlaying.name}
@@ -141,44 +131,71 @@ export default function NowPlaying() {
                 priority
                 unoptimized
                 className={`w-full h-full object-cover transition-all duration-700 ${
-                  !isPlaying ? "grayscale brightness-75 contrast-125" : ""
+                  isPlaying ? 'animate-spin-slow' : 'grayscale'
                 }`}
               />
-              <div className="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] z-10 bg-[length:100%_2px,3px_100%] pointer-events-none opacity-20"></div>
-            </div>
-
-            {/* Info Track */}
-            <div className="text-center space-y-2 border-t-2 border-dashed border-retro-text/20 pt-4">
-              <h2 className="text-2xl md:text-3xl font-display font-black leading-none uppercase truncate tracking-tighter">
-                {nowPlaying.name}
-              </h2>
-              <p className="text-sm font-bold font-mono text-retro-primary uppercase tracking-wider">
-                {nowPlaying.artists.map((artist) => artist.name).join(", ")}
-              </p>
-            </div>
-
-            {/* Progress Bar */}
-            <div className="mt-6 flex items-center gap-3 text-xs font-mono font-bold">
-              <span className="w-10 text-right">{formatTime(progress)}</span>
-              <div className="h-4 flex-1 bg-retro-bg border-2 border-retro-text relative shadow-[inset_2px_2px_0px_0px_rgba(0,0,0,0.1)]">
-                <div
-                  className={`h-full border-r-2 border-retro-text transition-all duration-1000 ease-linear relative ${
-                    isPlaying ? "bg-retro-primary" : "bg-zinc-400"
-                  }`}
-                  style={{ width: `${(progress / nowPlaying.duration_ms) * 100}%` }}
-                >
-                    <div className="absolute inset-0 w-full h-full opacity-30 bg-[repeating-linear-gradient(45deg,transparent,transparent_2px,#000_2px,#000_4px)]"></div>
-                </div>
+              
+              {/* CD Center Hole */}
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <div className="w-16 h-16 rounded-full bg-gray-900 border-4 border-retro-text shadow-inner"></div>
               </div>
-              <span className="w-10">{formatTime(nowPlaying.duration_ms)}</span>
+              
+              {/* Scanline Effect */}
+              <div className="absolute inset-0 bg-[linear-gradient(rgba(0,255,0,0.03)_50%,transparent_50%)] bg-[length:100%_4px] pointer-events-none"></div>
             </div>
-          </>
+
+            {/* Track Info Display */}
+            <div className="space-y-3 bg-black/40 backdrop-blur-sm rounded-lg p-4 border-2 border-green-500/30">
+              <div className="text-center space-y-2">
+                <h2 className="text-xl md:text-2xl font-display font-black leading-tight uppercase text-green-400 truncate drop-shadow-[0_0_10px_rgba(34,197,94,0.5)]">
+                  {nowPlaying.name}
+                </h2>
+                <p className="text-sm font-mono text-green-300/80 uppercase tracking-wider truncate">
+                  {nowPlaying.artists.map((artist) => artist.name).join(", ")}
+                </p>
+              </div>
+
+              {/* Progress Bar - VU Meter Style */}
+              <div className="flex items-center gap-3 text-xs font-mono font-bold text-green-400">
+                <span className="w-12 text-right">{formatTime(progress)}</span>
+                <div className="h-6 flex-1 bg-black border-2 border-green-500/50 relative rounded overflow-hidden shadow-inner">
+                  <div
+                    className={`h-full transition-all duration-1000 ease-linear relative ${
+                      isPlaying 
+                        ? 'bg-gradient-to-r from-green-600 via-green-400 to-green-300' 
+                        : 'bg-gray-600'
+                    }`}
+                    style={{ width: `${(progress / nowPlaying.duration_ms) * 100}%` }}
+                  >
+                    {isPlaying && (
+                      <div className="absolute inset-0 bg-[repeating-linear-gradient(90deg,transparent,transparent_2px,rgba(0,0,0,0.2)_2px,rgba(0,0,0,0.2)_4px)] animate-pulse"></div>
+                    )}
+                  </div>
+                </div>
+                <span className="w-12">{formatTime(nowPlaying.duration_ms)}</span>
+              </div>
+            </div>
+          </div>
         ) : (
-          <div className="text-center py-12 flex flex-col items-center justify-center">
-            <h3 className="text-xl font-bold font-display uppercase tracking-widest">System Idle</h3>
+          <div className="text-center py-12 flex flex-col items-center justify-center space-y-3">
+            <div className="text-6xl opacity-30">⏸️</div>
+            <h3 className="text-lg font-bold font-display uppercase tracking-widest text-gray-500">
+              NO DISC LOADED
+            </h3>
+            <p className="text-xs font-mono text-gray-600">Insert CD to begin playback</p>
           </div>
         )}
       </div>
+
+      <style jsx>{`
+        @keyframes spin-slow {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        .animate-spin-slow {
+          animation: spin-slow 4s linear infinite;
+        }
+      `}</style>
     </div>
   );
 }

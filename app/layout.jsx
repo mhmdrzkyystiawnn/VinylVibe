@@ -1,20 +1,5 @@
-import { Syne, Space_Mono } from "next/font/google";
 import "./globals.css";
-import { Providers } from "./providers"; // Import yang tadi kita buat
-
-// Setup Font
-const syne = Syne({
-  subsets: ["latin"],
-  variable: "--font-syne",
-  display: "swap",
-});
-
-const spaceMono = Space_Mono({
-  subsets: ["latin"],
-  weight: ["400", "700"],
-  variable: "--font-space-mono",
-  display: "swap",
-});
+import { Providers } from "./providers";
 
 export const metadata = {
   title: "VinylVibe",
@@ -24,8 +9,15 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={`${syne.variable} ${spaceMono.variable} antialiased bg-retro-bg text-retro-text font-body`}>
-        {/* Bungkus semua konten dengan Providers */}
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link 
+          href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=Space+Mono:wght@400;700&display=swap" 
+          rel="stylesheet" 
+        />
+      </head>
+      <body className="antialiased bg-retro-bg text-retro-text font-body">
         <Providers>
           {children}
         </Providers>

@@ -8,8 +8,8 @@
   --color-retro-dark: #AF3E3E;
   --color-retro-text: #3E2723;
 
-  --font-display: var(--font-syne), sans-serif;
-  --font-body: var(--font-space-mono), monospace;
+ --font-display: 'Syne', sans-serif;
+  --font-body: 'Space Mono', monospace;
 
   /* --- TAMBAHAN ANIMASI --- */
   --animate-marquee: marquee 15s linear infinite;
