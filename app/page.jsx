@@ -8,7 +8,7 @@ import Header from "@/components/Header";
 import NowPlaying from "@/components/NowPlaying";
 import TopTracks from "@/components/TopTracks";
 import RecentlyPlayed from "@/components/RecentlyPlayed";
-import VendingMachine from "@/components/VendingMachine";
+import VendingMachine from "@/components/VendingMachine/VendingMachine";
 
 export default function Home() {
   const { data: session } = useSession();
@@ -133,8 +133,8 @@ export default function Home() {
                 
                 {/* Now Playing Component */}
                 <div className="relative">
-                  <div className="absolute -left-3 -top-3 bg-retro-dark text-retro-bg px-2 py-1 text-[10px] font-black rounded border-2 border-retro-text shadow-md z-1000">
-                    DECK A
+                  <div className="absolute -left-3 -top-3 bg-retro-dark text-retro-bg px-2 py-1 text-[17px] font-black rounded border-2 border-retro-text shadow-md z-1000 md:text-[20px]">
+                    Now Playing:
                   </div>
                   <NowPlaying />
                 </div>
@@ -148,8 +148,8 @@ export default function Home() {
 
                 {/* Vending Machine Component */}
                 <div className="relative">
-                  <div className="absolute -left-3 -top-3 bg-retro-primary text-retro-bg px-2 py-1 text-[10px] font-black rounded border-2 border-retro-text shadow-md z-10">
-                    DECK B
+                  <div className="absolute left-1/2 -translate-x-1/2 -top-20 bg-retro-primary text-retro-bg px-2 py-1 text-[15px] font-black rounded border-2 border-retro-text shadow-md z-1000 md:text-[20px]">
+                   Get Recommendations:
                   </div>
                   <VendingMachine />
                 </div>
@@ -288,4 +288,4 @@ export default function Home() {
       `}</style>
     </main>
   );
-}
+} //app/page.jsx [page utama]

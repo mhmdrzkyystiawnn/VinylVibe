@@ -45,7 +45,7 @@ export default function LoginPage() {
         <div className="absolute bottom-3 right-3 w-3 h-3 bg-retro-text/20 rounded-full border border-retro-text/50"></div>
 
         {/* === LAYAR CRT (Main Screen) === */}
-        <div className="relative bg-black border-4 border-retro-text rounded-xl overflow-hidden shadow-[inset_0_0_40px_rgba(0,0,0,0.8)] min-h-[500px] flex flex-col items-center justify-between py-12 px-6">
+        <div className="relative bg-black border-4 border-retro-text rounded-xl overflow-hidden shadow-[inset_0_0_40px_rgba(0,0,0,0.8)] min-h-125 flex flex-col items-center justify-between py-12 px-6">
           
           {/* Efek Layar CRT */}
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.4)_100%)] pointer-events-none z-10"></div>
